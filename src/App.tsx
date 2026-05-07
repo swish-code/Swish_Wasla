@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, ChevronUp, ChevronRight, Phone, MapPin, Clock, Calendar, Globe, Star, Info, MessageSquare, AlertCircle, ShoppingBag, X, Beaker, User, Package, Skull, CalendarX, Frown, Wind, Waves, Flame, Archive, Repeat, Scale, Droplets, FlaskConical, Beef, AlertTriangle, Snowflake, Settings, PackageOpen, UserCircle, HelpCircle, ListChecks, Store, Smartphone, List, PencilLine, Image, Send, Bell, CreditCard, Truck, Users, Mail, Zap, Lock, LogOut, Plus, Trash2, Edit, Database, PhoneCall, XCircle, Activity, CloudRain, BarChart, ClipboardList, CheckCircle2, Check, RefreshCw } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, ChevronRight, Phone, MapPin, Clock, Calendar, Globe, Star, Info, MessageSquare, AlertCircle, ShoppingBag, X, Beaker, User, Package, Skull, CalendarX, Frown, Wind, Waves, Flame, Archive, Repeat, Scale, Droplets, FlaskConical, Beef, AlertTriangle, Snowflake, Settings, PackageOpen, UserCircle, HelpCircle, ListChecks, Store, Smartphone, List, PencilLine, Image, Send, Bell, CreditCard, Truck, Users, Mail, Zap, Lock, LogOut, Plus, Trash2, Edit, Database, PhoneCall, XCircle, Activity, CloudRain, BarChart, ClipboardList, CheckCircle2, Check, RefreshCw, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BRANCH_DATA, BRANDS, PROCESS_SCRIPTS, COMPLAINT_STATUSES, MEAT_SOURCES, CATERING_DATA, CANCELLATION_DATA, CONTACTS_DATA, ALLERGEN_DATA, INGERINES_DATA, TASK_DATA } from './data';
 import { BranchData, ViewType, User as UserType, AuthState, UserRole, BranchColumn } from './types';
@@ -17,7 +17,7 @@ const GlobalSearch = ({
 }: { 
   isOpen: boolean; 
   onClose: () => void; 
-  onSelectResult: (view: ViewType, brand?: string, allergenBrand?: any, ingerinesBrand?: string) => void;
+  onSelectResult: (view: ViewType, brand?: string, allergenBrand?: any, ingerinesBrand?: string, complainBrand?: string | null) => void;
 }) => {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,9 +44,13 @@ const GlobalSearch = ({
       { id: 'brand-pattie', label: 'Pattie Branches', view: 'branches', brand: 'Pattie Pattie', keywords: 'pattie باتي' },
       { id: 'brand-just', label: 'Just Branches', view: 'branches', brand: 'Just C', keywords: 'just جست' },
       { id: 'brand-chili', label: 'Chili Branches', view: 'branches', brand: 'Chili pepper', keywords: 'chili تشيلي فلفل' },
+      { id: 'brand-tabel', label: 'Tabel Branches', view: 'branches', brand: 'Tabel', keywords: 'tabel تابل' },
+      { id: 'brand-mishmash', label: 'Mishmash Branches', view: 'branches', brand: 'Mishmash', keywords: 'mishmash ميش ماش' },
       { id: 'proc-new', label: 'New Order Process', view: 'new-order', keywords: 'new order طلب جديد سكريبت' },
       { id: 'proc-follow', label: 'Follow Up Process', view: 'follow-up', keywords: 'follow up متابعة استلام' },
       { id: 'proc-complain', label: 'Complain Process', view: 'complain', keywords: 'complain شكوى مشكلة' },
+      { id: 'proc-complain-mishmash', label: 'Mishmash Complain', view: 'complain', complainBrand: 'Mishmash', keywords: 'mishmash complain شكوى مشماش' },
+      { id: 'proc-complain-tabel', label: 'Tabel Complain', view: 'complain', complainBrand: 'Tabel', keywords: 'tabel complain شكوى تابل' },
       { id: 'proc-status', label: 'Complaint Status', view: 'complaint-status', keywords: 'status حالة شكوى' },
       { id: 'proc-additional', label: 'Additional Process', view: 'additional', keywords: 'additional اضافة زيادة' },
       { id: 'serv-meat', label: 'Meat Sources', view: 'meat-sources', keywords: 'meat sources مصادر اللحوم' },
@@ -57,6 +61,7 @@ const GlobalSearch = ({
       { id: 'all-chili', label: 'Chili Allergens', view: 'allergens', allergenBrand: 'chili', keywords: 'allergen chili حساسية' },
       { id: 'all-pattie', label: 'Pattie Allergens', view: 'allergens', allergenBrand: 'pattie', keywords: 'allergen pattie حساسية' },
       { id: 'all-bbt', label: 'BBT Allergens', view: 'allergens', allergenBrand: 'bbt', keywords: 'allergen bbt حساسية' },
+      { id: 'all-mishmash', label: 'Mishmash Allergens', view: 'allergens', allergenBrand: 'mishmash', keywords: 'allergen mishmash حساسية' },
       { id: 'ing-shakir', label: 'Shakir Ingredients', view: 'ingerines', ingerinesBrand: 'shakir', keywords: 'ingredients shakir مكونات شاكر' },
       { id: 'ing-just', label: 'Just Ingredients', view: 'ingerines', ingerinesBrand: 'just', keywords: 'ingredients just مكونات جست' },
     ];
@@ -70,7 +75,8 @@ const GlobalSearch = ({
           view: item.view,
           brand: item.brand,
           allergenBrand: item.allergenBrand,
-          ingerinesBrand: item.ingerinesBrand
+          ingerinesBrand: item.ingerinesBrand,
+          complainBrand: (item as any).complainBrand
         });
       }
     });
@@ -151,6 +157,36 @@ const GlobalSearch = ({
       });
     });
 
+    results.push({
+      type: 'Page',
+      title: 'Mishmash Complain',
+      subtitle: 'Navigation',
+      view: 'complain' as ViewType,
+      complainBrand: 'Mishmash'
+    });
+
+    results.push({
+      type: 'Page',
+      title: 'Tabel Complain',
+      subtitle: 'Navigation',
+      view: 'complain' as ViewType,
+      complainBrand: 'Tabel'
+    });
+    
+    results.push({
+      type: 'Page',
+      title: 'Mishmash Contacts',
+      subtitle: 'Navigation',
+      view: 'mishmash-contact' as ViewType
+    });
+
+    results.push({
+      type: 'Page',
+      title: 'Tabel Contacts',
+      subtitle: 'Navigation',
+      view: 'tabel-contact' as ViewType
+    });
+
     return results.slice(0, 8);
   }, [query]);
 
@@ -209,7 +245,7 @@ const GlobalSearch = ({
                     <button
                       key={idx}
                       onClick={() => {
-                        onSelectResult(result.view, result.brand, result.allergenBrand, result.ingerinesBrand);
+                        onSelectResult(result.view, result.brand, result.allergenBrand, result.ingerinesBrand, result.complainBrand);
                         onClose();
                       }}
                       className="w-full text-left p-4 rounded-2xl bg-transparent hover:bg-white dark:hover:bg-gray-800 hover:shadow-md dark:hover:shadow-none hover:border-gray-100 dark:hover:border-gray-700 border border-transparent transition-all flex items-center justify-between group"
@@ -650,6 +686,7 @@ export default function App() {
   const [selectedProcessSubtype, setSelectedProcessSubtype] = useState<'pickup' | 'delivery'>('pickup');
   const [selectedFollowUpSubtype, setSelectedFollowUpSubtype] = useState<string>('talabat');
   const [selectedComplainType, setSelectedComplainType] = useState<string>('');
+  const [selectedComplainBrand, setSelectedComplainBrand] = useState<string | null>(null);
   const [selectedAdditionalSubtype, setSelectedAdditionalSubtype] = useState<string>('aggregators');
   const [selectedSpecialRequestsSubtype, setSelectedSpecialRequestsSubtype] = useState<string>('aggregators');
   const [selectedTalabatKeetaSubtype, setSelectedTalabatKeetaSubtype] = useState<'talabat' | 'keeta'>('talabat');
@@ -659,7 +696,7 @@ export default function App() {
   const [isCancellationDropdownOpen, setIsCancellationDropdownOpen] = useState(false);
   const [isContactsDropdownOpen, setIsContactsDropdownOpen] = useState(false);
   const [isAllergensDropdownOpen, setIsAllergensDropdownOpen] = useState(false);
-  const [selectedAllergenBrand, setSelectedAllergenBrand] = useState<'yelo' | 'bbt' | 'just' | 'slice' | 'chili' | 'pattie'>('yelo');
+  const [selectedAllergenBrand, setSelectedAllergenBrand] = useState<'yelo' | 'bbt' | 'just' | 'slice' | 'chili' | 'pattie' | 'mishmash'>('yelo');
   const [selectedAllergenCategory, setSelectedAllergenCategory] = useState<string>('');
   const [isIngerinesDropdownOpen, setIsIngerinesDropdownOpen] = useState(false);
   const [selectedIngerinesBrand, setSelectedIngerinesBrand] = useState<string>('shakir');
@@ -1471,6 +1508,8 @@ export default function App() {
               selectedAllergenBrand={selectedAllergenBrand}
               setSelectedIngerinesBrand={setSelectedIngerinesBrand}
               selectedIngerinesBrand={selectedIngerinesBrand}
+              selectedComplainBrand={selectedComplainBrand}
+              setSelectedComplainBrand={setSelectedComplainBrand}
               pinnedViews={pinnedViews}
               togglePin={togglePin}
               onSearchOpen={() => setIsSearchOpen(true)}
@@ -1511,11 +1550,12 @@ export default function App() {
           <GlobalSearch 
             isOpen={isSearchOpen}
             onClose={() => setIsSearchOpen(false)}
-            onSelectResult={(view, brand, allergenBrand, ingerinesBrand) => {
+            onSelectResult={(view, brand, allergenBrand, ingerinesBrand, complainBrand) => {
               setCurrentView(view);
               if (brand) setSelectedBrand(brand);
               if (allergenBrand) setSelectedAllergenBrand(allergenBrand);
               if (ingerinesBrand) setSelectedIngerinesBrand(ingerinesBrand);
+              if (complainBrand !== undefined) setSelectedComplainBrand(complainBrand);
             }}
           />
           <div className="max-w-[1600px] mx-auto w-full px-3 sm:px-8 pt-4 lg:pt-8">
@@ -1523,118 +1563,188 @@ export default function App() {
           </div>
         <AnimatePresence mode="wait">
           {currentView === 'login' ? (
-            <motion.div
+            <motion.div 
               key="login"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex min-h-screen"
+              className="fixed inset-0 flex flex-col lg:flex-row bg-[#080808] z-[9999]"
             >
-              {/* Left Side - Welcome Panel */}
-              <div className="hidden lg:flex w-1/2 bg-[#111111] dark:bg-black p-16 flex-col justify-between text-white relative overflow-hidden">
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-16">
-                    <div className="w-10 h-10 bg-[#00965e] rounded-xl flex items-center justify-center font-black text-xl shadow-lg shadow-green-900/40">W</div>
-                    <span className="text-xl font-black tracking-tight italic">Wasla Knowledge Base</span>
-                  </div>
-                  
+              {/* Left Side: Brand Visual Panel */}
+              <div className="relative hidden lg:flex lg:w-[60%] h-full overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
+                <img 
+                  src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop" 
+                  alt="Wasla Brands"
+                  className="absolute inset-0 w-full h-full object-cover scale-110 grayscale-[0.2] brightness-75 transition-transform duration-[20s] animate-pulse-slow"
+                />
+                
+                {/* Brand Overlay Content */}
+                <div className="relative z-20 p-20 flex flex-col justify-between h-full w-full">
+                  <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5, duration: 1 }}
+                  >
+                    <div className="flex items-center gap-4 mb-2">
+                       <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-[0_0_40px_rgba(16,185,129,0.4)]">W</div>
+                       <span className="text-2xl font-black tracking-tight text-white/90 italic uppercase">WASLA ENTERPRISE Swish KNOWLEDGE base</span>
+                    </div>
+                    <div className="h-[1px] w-48 bg-gradient-to-r from-emerald-500 to-transparent" />
+                  </motion.div>
+
                   <div className="space-y-4">
-                    <h1 className="text-7xl font-black tracking-tighter leading-[0.9] uppercase">
-                      WASLA<br/>
-                      KNOWLEDGE<br/>
-                      <span className="text-[#059669]">BASE</span>
-                    </h1>
-                    <p className="text-xl text-gray-400 dark:text-gray-500 max-w-md font-medium leading-relaxed opacity-80">
-                      A professional platform designed for efficient handling and tracking of menu items, brands, and product configurations.
-                    </p>
+                    <motion.h1 
+                      initial={{ opacity: 0, y: 40 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7, duration: 1 }}
+                      className="text-[120px] font-black leading-[0.85] tracking-tighter text-white uppercase"
+                    >
+                      Swish KNOWLEDGE<br/>
+                      <span className="text-emerald-500">base</span>
+                    </motion.h1>
+                    <motion.p 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1, duration: 1 }}
+                      className="text-2xl text-white/40 max-w-lg font-light leading-relaxed font-sans"
+                    >
+                      The standard for administrative brands management. Integrated intelligence for modern gastronomy.
+                    </motion.p>
                   </div>
+
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.2 }}
+                    className="flex items-center gap-10 text-xs font-black uppercase tracking-[0.4em] text-white/30"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      <span>SECURE TERMINAL</span>
+                    </div>
+                    <div className="w-12 h-[1px] bg-white/20" />
+                    <span>v2.4.0 PRO EDITION</span>
+                  </motion.div>
                 </div>
 
-                <div className="relative z-10 flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 dark:text-gray-600">
-                  <span>EST. 2026</span>
-                  <div className="w-12 h-[1px] bg-gray-800 dark:bg-gray-900" />
-                  <span>PROFESSIONAL GRADE</span>
-                </div>
-
-                {/* Subtle Background Elements */}
-                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-green-900/5 rounded-full blur-[120px] -mr-40 -mt-40" />
-                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-900/5 rounded-full blur-[100px] -ml-20 -mb-20" />
+                {/* Grain Overlay */}
+                <div className="absolute inset-0 opacity-[0.15] pointer-events-none mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
               </div>
 
-              {/* Right Side - Login Panel */}
-              <div className="w-full lg:w-1/2 bg-white dark:bg-gray-950 flex flex-col justify-center items-center p-6 sm:p-12 md:p-24 relative min-h-screen lg:min-h-0 overflow-y-auto">
-                <div className="w-full max-w-md">
-                  <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
-                    <div className="w-10 h-10 bg-[#00965e] rounded-xl flex items-center justify-center font-black text-xl text-white shadow-lg shadow-green-900/20">W</div>
-                    <span className="text-xl font-black tracking-tight dark:text-white">Wasla Knowledge Base</span>
-                  </div>
-                  
-                  <div className="mb-10 text-center lg:text-left">
-                    <h2 className="text-3xl lg:text-4xl font-black text-gray-900 dark:text-white tracking-tighter mb-2 uppercase">Welcome Back</h2>
-                    <p className="text-gray-500 dark:text-gray-400 font-medium">Please enter your details to sign in</p>
+              {/* Right Side: Authentication Panel */}
+              <div className="w-full lg:w-[40%] bg-white dark:bg-[#0f0f12] flex flex-col p-8 sm:p-20 relative overflow-y-auto">
+                <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="lg:hidden flex items-center gap-4 mb-12"
+                  >
+                    <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center font-black text-2xl text-white">W</div>
+                    <span className="text-2xl font-black tracking-tight dark:text-white">WASLA</span>
+                  </motion.div>
+
+                  <div className="mb-12">
+                    <motion.h2 
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-5xl font-black text-gray-900 dark:text-white tracking-tighter mb-4 uppercase"
+                    >
+                      Sign In
+                    </motion.h2>
+                    <motion.p 
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-gray-400 dark:text-gray-500 font-medium text-lg leading-snug"
+                    >
+                      Welcome back. Please authenticate to access the enterprise layer.
+                    </motion.p>
                   </div>
 
                   <form onSubmit={handleLogin} className="space-y-8">
                     {loginError && (
                       <motion.div 
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 text-red-700 dark:text-red-400 text-sm font-bold flex items-center gap-3 rounded-r-xl"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-red-500/10 border border-red-500/20 p-5 text-red-600 dark:text-red-400 text-sm font-bold flex items-center gap-4 rounded-2xl"
                       >
-                         <AlertCircle size={20} />
-                         {loginError}
+                         <AlertCircle size={24} className="shrink-0" />
+                         <span className="leading-tight">{loginError}</span>
                       </motion.div>
                     )}
 
                     <div className="space-y-6">
-                      <div className="group">
-                        <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 group-focus-within:text-[#00965e] transition-colors">Username</label>
-                        <div className="relative">
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        <label className="block text-[11px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] mb-4">Email</label>
+                        <div className="relative group">
                           <input 
                             type="email" 
-                            required
+                            required 
                             value={loginEmail}
                             onChange={(e) => setLoginEmail(e.target.value)}
-                            className="w-full pl-12 pr-4 py-4 bg-[#f0f4f8] dark:bg-gray-800 border-none rounded-2xl focus:ring-2 focus:ring-[#00965e]/30 outline-none font-bold text-gray-700 dark:text-gray-200 transition-all placeholder:text-gray-300 dark:placeholder:text-gray-600"
-                            placeholder="admin"
+                            className="w-full px-6 py-5 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-emerald-500 dark:focus:border-emerald-500 rounded-2xl outline-none font-bold text-gray-800 dark:text-white transition-all placeholder:text-gray-300 dark:placeholder:text-gray-700"
+                            placeholder="admin@wasla.system"
                           />
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#00965e] transition-colors" size={20} />
+                          <User className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300 dark:text-white/10 group-focus-within:text-emerald-500 transition-colors" size={20} />
                         </div>
-                      </div>
+                      </motion.div>
 
-                      <div className="group">
-                        <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 group-focus-within:text-[#00965e] transition-colors">Password</label>
-                        <div className="relative">
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        <div className="flex justify-between items-center mb-4">
+                          <label className="block text-[11px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em]">Password</label>
+                          <button type="button" className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.1em] hover:text-emerald-400 transition-colors">Forgot Password?</button>
+                        </div>
+                        <div className="relative group">
                           <input 
                             type="password" 
-                            required
+                            required 
                             value={loginPassword}
                             onChange={(e) => setLoginPassword(e.target.value)}
-                            className="w-full pl-12 pr-4 py-4 bg-[#f0f4f8] dark:bg-gray-800 border-none rounded-2xl focus:ring-2 focus:ring-[#00965e]/30 outline-none font-bold text-gray-700 dark:text-gray-200 transition-all placeholder:text-gray-300 dark:placeholder:text-gray-600"
+                            className="w-full px-6 py-5 bg-gray-50 dark:bg-white/5 border border-transparent focus:border-emerald-500 dark:focus:border-emerald-500 rounded-2xl outline-none font-bold text-gray-800 dark:text-white transition-all placeholder:text-gray-300 dark:placeholder:text-gray-700"
                             placeholder="••••••••"
                           />
-                          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#00965e] transition-colors" size={20} />
+                          <Lock className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300 dark:text-white/10 group-focus-within:text-emerald-500 transition-colors" size={20} />
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
 
-                    <button 
+                    <motion.button 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
                       type="submit"
-                      className="w-full py-5 bg-[#00965e] text-white rounded-2xl font-bold text-lg hover:bg-[#008150] transition-all shadow-xl shadow-green-200 dark:shadow-none hover:shadow-green-300 active:scale-[0.98] flex items-center justify-center gap-3"
+                      className="group relative w-full py-6 bg-emerald-500 text-white rounded-2xl font-black text-xl overflow-hidden shadow-2xl shadow-emerald-500/20 active:scale-[0.98] transition-all"
                     >
-                      Sign In to Dashboard
-                    </button>
+                      <span className="relative z-10 flex items-center justify-center gap-4 uppercase tracking-tighter">
+                        Authorize Entry <ArrowRight className="group-hover:translate-x-2 transition-transform" />
+                      </span>
+                    </motion.button>
                   </form>
-
-                  <div className="mt-20 pt-8 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                    <p className="text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-wider max-w-[200px] leading-loose">
-                      © 2026 WASLA KNOWLEDGE BASE. ALL RIGHTS RESERVED.
-                    </p>
-                    <button className="text-[10px] font-black text-[#00965e] uppercase tracking-widest hover:underline">
-                      العربية
-                    </button>
-                  </div>
                 </div>
+
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                  className="mt-20 pt-10 border-t border-gray-100 dark:border-white/5 flex items-center justify-between"
+                >
+                  <p className="text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] max-w-[150px] leading-relaxed">
+                    Secure environment<br/>© 2026 WASLA SYSTEMS
+                  </p>
+                  <button className="flex items-center gap-2 group">
+                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest group-hover:underline">Arabic Interface</span>
+                  </button>
+                </motion.div>
               </div>
             </motion.div>
           ) : currentView === 'branches' ? (
@@ -2218,7 +2328,7 @@ export default function App() {
             </motion.div>
           ) : currentView === 'complain' ? (
             <motion.div
-              key="complain"
+              key={`complain-${selectedComplainBrand}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -2228,7 +2338,7 @@ export default function App() {
               <div className="text-center mb-10">
                 <span className="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] mb-4 block">Process Workflow</span>
                 <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-4">
-                  Complain Process
+                  {selectedComplainBrand ? `${selectedComplainBrand} ` : ''}Complain Process
                 </h1>
                 <div className="w-12 h-1 bg-blue-600 mx-auto rounded-full"></div>
               </div>
@@ -2237,26 +2347,30 @@ export default function App() {
                 <div className="relative group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000 group-hover:duration-200"></div>
                   <div className="relative">
-                    <select
-                      className="w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-6 py-4 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold text-center text-gray-800 dark:text-gray-200 shadow-sm transition-all hover:border-blue-400 capitalize cursor-pointer pr-12"
-                      value={selectedComplainType}
-                      onChange={(e) => setSelectedComplainType(e.target.value)}
-                    >
-                      <option value="" className="dark:bg-gray-900">Type OF Complain</option>
-                      {Object.keys(PROCESS_SCRIPTS.complain.types).map(type => (
-                        <option key={type} value={type} className="capitalize py-2 dark:bg-gray-900">
-                          {type.replace(/-/g, ' ')}
-                        </option>
-                      ))}
-                    </select>
+                      <select
+                        className="w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-6 py-4 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold text-center text-gray-800 dark:text-gray-200 shadow-sm transition-all hover:border-blue-400 capitalize cursor-pointer pr-12"
+                        value={selectedComplainType}
+                        onChange={(e) => setSelectedComplainType(e.target.value)}
+                      >
+                        <option value="" className="dark:bg-gray-900">Type OF Complain</option>
+                        {Object.keys(selectedComplainBrand && (PROCESS_SCRIPTS as any).brandComplaints?.[selectedComplainBrand] 
+                          ? (PROCESS_SCRIPTS as any).brandComplaints[selectedComplainBrand].types
+                          : PROCESS_SCRIPTS.complain.types).map(type => (
+                          <option key={type} value={type} className="capitalize py-2 dark:bg-gray-900">
+                            {type.replace(/-/g, ' ')}
+                          </option>
+                        ))}
+                      </select>
                     <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 transition-colors group-hover:text-blue-500" size={20} />
                   </div>
                 </div>
               </div>
 
-              <AnimatePresence mode="wait">
-                {selectedComplainType && (
-                  <motion.div
+                <AnimatePresence mode="wait">
+                  {selectedComplainType && (selectedComplainBrand && (PROCESS_SCRIPTS as any).brandComplaints?.[selectedComplainBrand] 
+                    ? (PROCESS_SCRIPTS as any).brandComplaints[selectedComplainBrand].types[selectedComplainType]
+                    : PROCESS_SCRIPTS.complain.types[selectedComplainType as keyof typeof PROCESS_SCRIPTS.complain.types]) && (
+                    <motion.div
                     key={selectedComplainType}
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -2275,8 +2389,10 @@ export default function App() {
                         </div>
                         <div className="text-gray-600 dark:text-gray-400 text-[15px] leading-relaxed font-medium">
                           <EditableText 
-                            contentKey={`process_complain_${selectedComplainType}_call`}
-                            defaultValue={t(`process_complain_${selectedComplainType}_call`, PROCESS_SCRIPTS.complain.types[selectedComplainType as keyof typeof PROCESS_SCRIPTS.complain.types].call)}
+                            contentKey={`process_complain_${selectedComplainBrand || 'general'}_${selectedComplainType}_call`}
+                            defaultValue={t(`process_complain_${selectedComplainBrand || 'general'}_${selectedComplainType}_call`, (selectedComplainBrand && (PROCESS_SCRIPTS as any).brandComplaints?.[selectedComplainBrand] 
+                              ? (PROCESS_SCRIPTS as any).brandComplaints[selectedComplainBrand].types[selectedComplainType]
+                              : PROCESS_SCRIPTS.complain.types[selectedComplainType as keyof typeof PROCESS_SCRIPTS.complain.types]).call)}
                             canEdit={canEdit}
                             onSave={handleSaveOverride}
                             onDelete={handleDeleteOverride}
@@ -2297,8 +2413,10 @@ export default function App() {
                         </div>
                         <div className="text-gray-600 dark:text-gray-400 text-[15px] leading-relaxed font-medium">
                           <EditableText 
-                            contentKey={`process_complain_${selectedComplainType}_platform`}
-                            defaultValue={t(`process_complain_${selectedComplainType}_platform`, PROCESS_SCRIPTS.complain.types[selectedComplainType as keyof typeof PROCESS_SCRIPTS.complain.types].platform)}
+                            contentKey={`process_complain_${selectedComplainBrand || 'general'}_${selectedComplainType}_platform`}
+                            defaultValue={t(`process_complain_${selectedComplainBrand || 'general'}_${selectedComplainType}_platform`, (selectedComplainBrand && (PROCESS_SCRIPTS as any).brandComplaints?.[selectedComplainBrand] 
+                              ? (PROCESS_SCRIPTS as any).brandComplaints[selectedComplainBrand].types[selectedComplainType]
+                              : PROCESS_SCRIPTS.complain.types[selectedComplainType as keyof typeof PROCESS_SCRIPTS.complain.types]).platform)}
                             canEdit={canEdit}
                             onSave={handleSaveOverride}
                             onDelete={handleDeleteOverride}
@@ -2321,8 +2439,8 @@ export default function App() {
                       </div>
                       <h3 className="text-2xl font-black text-white tracking-tight">
                         <EditableText 
-                          contentKey="process_complain_notes_title"
-                          defaultValue={t("process_complain_notes_title", PROCESS_SCRIPTS.complain.notes.title)}
+                          contentKey={`process_complain_${selectedComplainBrand || 'general'}_notes_title`}
+                          defaultValue={t(`process_complain_${selectedComplainBrand || 'general'}_notes_title`, PROCESS_SCRIPTS.complain.notes.title)}
                           canEdit={canEdit}
                           onSave={handleSaveOverride}
                           onDelete={handleDeleteOverride}
@@ -2336,8 +2454,8 @@ export default function App() {
                           {PROCESS_SCRIPTS.complain.notes.items.slice(0, 8).map((item, idx) => (
                             <div key={idx} className={idx === 0 ? "text-xl font-bold text-white mb-6 pb-4 border-b border-white/10" : "hover:text-white transition-colors"}>
                               <EditableText 
-                                contentKey={`process_complain_notes_item_l1_${idx}`}
-                                defaultValue={t(`process_complain_notes_item_l1_${idx}`, item)}
+                                contentKey={`process_complain_${selectedComplainBrand || 'general'}_notes_item_l1_${idx}`}
+                                defaultValue={t(`process_complain_${selectedComplainBrand || 'general'}_notes_item_l1_${idx}`, item)}
                                 canEdit={canEdit}
                                 onSave={handleSaveOverride}
                                 onDelete={handleDeleteOverride}
@@ -2352,8 +2470,8 @@ export default function App() {
                         {PROCESS_SCRIPTS.complain.notes.items.slice(8).map((item, idx) => (
                           <div key={idx} className="bg-white/5 rounded-2xl p-6 border border-white/5 hover:bg-white/[0.07] transition-all">
                             <EditableText 
-                              contentKey={`process_complain_notes_item_l2_${idx}`}
-                              defaultValue={t(`process_complain_notes_item_l2_${idx}`, item)}
+                              contentKey={`process_complain_${selectedComplainBrand || 'general'}_notes_item_l2_${idx}`}
+                              defaultValue={t(`process_complain_${selectedComplainBrand || 'general'}_notes_item_l2_${idx}`, item)}
                               canEdit={canEdit}
                               onSave={handleSaveOverride}
                               onDelete={handleDeleteOverride}
@@ -2373,7 +2491,7 @@ export default function App() {
                 </div>
               </div>
             </motion.div>
-          ) : currentView === 'complaint-status' ? (
+            ) : currentView === 'complaint-status' ? (
             <motion.div
               key="complaint-status"
               initial={{ opacity: 0, scale: 0.98 }}
@@ -3236,6 +3354,168 @@ export default function App() {
                         </div>
                       ))}
                     </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ) : currentView === 'tabel-contact' ? (
+            <motion.div
+              key="tabel-contact"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="max-w-6xl mx-auto px-4 pb-20"
+            >
+              <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
+                <div className="p-8 md:p-12">
+                  <div className="text-center mb-12">
+                    <h2 className="text-3xl font-black text-blue-900 mb-2">
+                       <EditableText 
+                        contentKey="contact_tabel_title"
+                        defaultValue={t("contact_tabel_title", "Tabel Branch Contacts")}
+                        canEdit={canEdit}
+                        onSave={handleSaveOverride}
+                        onDelete={handleDeleteOverride}
+                      />
+                    </h2>
+                    <div className="h-1 w-20 bg-yellow-400 mx-auto rounded-full"></div>
+                  </div>
+
+                  <div className="overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50 border-b border-gray-200">
+                          <th className="px-6 py-4 text-xs font-black uppercase text-gray-500 tracking-wider">Branch</th>
+                          <th className="px-6 py-4 text-xs font-black uppercase text-gray-500 tracking-wider">Staff</th>
+                          <th className="px-6 py-4 text-xs font-black uppercase text-gray-500 tracking-wider">Contact Number</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {CONTACTS_DATA.tabel.map((item, idx) => (
+                          <tr key={idx} className="hover:bg-yellow-50/30 transition-colors">
+                            <td className="px-6 py-4 text-sm font-bold text-gray-900">
+                              <EditableText 
+                                contentKey={`contact_tabel_branch_${idx}_name`}
+                                defaultValue={t(`contact_tabel_branch_${idx}_name`, item.branch)}
+                                canEdit={canEdit}
+                                onSave={handleSaveOverride}
+                                onDelete={handleDeleteOverride}
+                              />
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600">
+                              <EditableText 
+                                contentKey={`contact_tabel_branch_${idx}_staff`}
+                                defaultValue={t(`contact_tabel_branch_${idx}_staff`, item.staff)}
+                                canEdit={canEdit}
+                                onSave={handleSaveOverride}
+                                onDelete={handleDeleteOverride}
+                              />
+                            </td>
+                            <td className="px-6 py-4 text-sm">
+                              {item.phone && item.phone !== 'Kharen' ? (
+                                <a href={`tel:${item.phone}`} className="flex items-center space-x-2 text-blue-600 font-bold hover:underline">
+                                  <Phone size={14} />
+                                  <span>
+                                    <EditableText 
+                                      contentKey={`contact_tabel_branch_${idx}_phone`}
+                                      defaultValue={t(`contact_tabel_branch_${idx}_phone`, item.phone)}
+                                      canEdit={canEdit}
+                                      onSave={handleSaveOverride}
+                                      onDelete={handleDeleteOverride}
+                                    />
+                                  </span>
+                                </a>
+                              ) : (
+                                <span className="text-gray-400 italic">
+                                  <EditableText 
+                                    contentKey={`contact_tabel_branch_${idx}_phone_unavailable`}
+                                    defaultValue={t(`contact_tabel_branch_${idx}_phone_unavailable`, item.phone || "No phone")}
+                                    canEdit={canEdit}
+                                    onSave={handleSaveOverride}
+                                    onDelete={handleDeleteOverride}
+                                  />
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ) : currentView === 'mishmash-contact' ? (
+            <motion.div
+              key="mishmash-contact"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="max-w-6xl mx-auto px-4 pb-20"
+            >
+              <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
+                <div className="p-8 md:p-12">
+                  <div className="text-center mb-12">
+                    <h2 className="text-3xl font-black text-blue-900 mb-2">
+                       <EditableText 
+                        contentKey="contact_mishmash_title"
+                        defaultValue={t("contact_mishmash_title", "Mishmash Branch Contacts")}
+                        canEdit={canEdit}
+                        onSave={handleSaveOverride}
+                        onDelete={handleDeleteOverride}
+                      />
+                    </h2>
+                    <div className="h-1 w-20 bg-yellow-400 mx-auto rounded-full"></div>
+                  </div>
+
+                  <div className="overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50 border-b border-gray-200">
+                          <th className="px-6 py-4 text-xs font-black uppercase text-gray-500 tracking-wider">Branch</th>
+                          <th className="px-6 py-4 text-xs font-black uppercase text-gray-500 tracking-wider">Staff</th>
+                          <th className="px-6 py-4 text-xs font-black uppercase text-gray-500 tracking-wider">Contact Number</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {CONTACTS_DATA.mishmash.map((item, idx) => (
+                          <tr key={idx} className="hover:bg-yellow-50/30 transition-colors">
+                            <td className="px-6 py-4 text-sm font-bold text-gray-900">
+                              <EditableText 
+                                contentKey={`contact_mishmash_branch_${idx}_name`}
+                                defaultValue={t(`contact_mishmash_branch_${idx}_name`, item.branch)}
+                                canEdit={canEdit}
+                                onSave={handleSaveOverride}
+                                onDelete={handleDeleteOverride}
+                              />
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600">
+                              <EditableText 
+                                contentKey={`contact_mishmash_branch_${idx}_staff`}
+                                defaultValue={t(`contact_mishmash_branch_${idx}_staff`, item.staff)}
+                                canEdit={canEdit}
+                                onSave={handleSaveOverride}
+                                onDelete={handleDeleteOverride}
+                              />
+                            </td>
+                            <td className="px-6 py-4 text-sm">
+                              <a href={`tel:${item.phone}`} className="flex items-center space-x-2 text-blue-600 font-bold hover:underline">
+                                <Phone size={14} />
+                                <span>
+                                  <EditableText 
+                                    contentKey={`contact_mishmash_branch_${idx}_phone`}
+                                    defaultValue={t(`contact_mishmash_branch_${idx}_phone`, item.phone)}
+                                    canEdit={canEdit}
+                                    onSave={handleSaveOverride}
+                                    onDelete={handleDeleteOverride}
+                                  />
+                                </span>
+                              </a>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -4664,6 +4944,54 @@ export default function App() {
                                 <EditableText 
                                   contentKey={`extension_brand_${idx}_landline`}
                                   defaultValue={t(`extension_brand_${idx}_landline`, brand.landline)}
+                                  canEdit={canEdit}
+                                  onSave={handleSaveOverride}
+                                  onDelete={handleDeleteOverride}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Agents Extension Numbers */}
+                  <div className="mt-12">
+                    <h3 className="text-2xl font-black text-blue-900 mb-6 flex items-center gap-3">
+                      <div className="w-2 h-8 bg-green-500 rounded-full"></div>
+                      Agents Extension Numbers
+                    </h3>
+                    <div className="overflow-hidden border border-gray-100 rounded-3xl shadow-lg">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="bg-gray-800 text-white">
+                            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest text-center w-32">EXT no.</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest">Name</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {CONTACTS_DATA.extensions.agents.map((agent: any, idx: number) => (
+                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-6 py-4 text-center">
+                                {agent.ext ? (
+                                  <span className="px-4 py-1 bg-green-100 text-green-700 rounded-lg font-black text-sm">
+                                    <EditableText 
+                                      contentKey={`extension_agent_${idx}_ext`}
+                                      defaultValue={t(`extension_agent_${idx}_ext`, agent.ext)}
+                                      canEdit={canEdit}
+                                      onSave={handleSaveOverride}
+                                      onDelete={handleDeleteOverride}
+                                    />
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-300">—</span>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 font-bold text-gray-700">
+                                <EditableText 
+                                  contentKey={`extension_agent_${idx}_name`}
+                                  defaultValue={t(`extension_agent_${idx}_name`, agent.name)}
                                   canEdit={canEdit}
                                   onSave={handleSaveOverride}
                                   onDelete={handleDeleteOverride}
