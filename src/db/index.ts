@@ -27,7 +27,7 @@ export const db = dbInstance;
 
 // Initial tables setup
 let setupStarted = false;
-const setup = async () => {
+export const setupDb = async () => {
   if (setupStarted) return;
   setupStarted = true;
   
@@ -202,7 +202,8 @@ const setup = async () => {
     console.log("Database setup completed successfully.");
   } catch (error) {
     console.error("Database setup failed:", error);
+    throw error; // Re-throw so server knows it failed
   }
 };
 
-setup();
+// setup(); removed - called from server.ts
