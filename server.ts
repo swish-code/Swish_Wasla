@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
-import { db } from "./src/db/index.ts";
+import { db, setupDb } from "./src/db/index.ts";
 import { users, branches, tasks, contentOverrides, logs, requests, branchColumns, customCards, notifications, userNotifications } from "./src/db/schema.ts";
 import { BRANCH_DATA, TASK_DATA } from "./src/data.ts";
 import { eq, desc, ilike, or, asc, and } from "drizzle-orm";
@@ -30,6 +30,48 @@ async function startServer() {
 
   app.use(express.json());
   app.use(cookieParser());
+
+  // Background Database Setup
+  const initializeDatabase = async () => {
+    try {
+      await setupDb();
+      console.log("Database schema initialized.");
+      
+      // Bootstrap branches: Only if empty
+      const branchCount = await db.select({ count: branches.id }).from(branches).limit(1);
+      if (branchCount.length === 0) {
+        console.log(`Seeding ${BRANCH_DATA.length} branches...`);
+        for (let i = 0; i < BRANCH_DATA.length; i++) {
+          const bd = BRANCH_DATA[i];
+          const { id: _, ...data } = bd as any;
+          await db.insert(branches).values({
+            ...data,
+            sortOrder: i + 1
+          });
+        }
+        console.log("Branch seeding complete.");
+      }
+
+      // Bootstrap tasks: Only if empty
+      const taskCount = await db.select({ count: tasks.id }).from(tasks).limit(1);
+      if (taskCount.length === 0) {
+        console.log(`Seeding ${TASK_DATA.length} tasks...`);
+        for (const t of TASK_DATA) {
+          await db.insert(tasks).values({
+            status: t.status,
+            brand: t.brand,
+            branch: t.branch,
+            location: t.location
+          });
+        }
+        console.log("Task seeding complete.");
+      }
+    } catch (err) {
+      console.error("Database initialization failed:", err);
+    }
+  };
+
+  initializeDatabase();
 
   // --- Socket.IO Connection ---
   io.on("connection", (socket) => {
@@ -80,59 +122,6 @@ async function startServer() {
       console.error("Failed to broadcast notification:", err);
     }
   };
-
-  // Bootstrap branches: Update existing or add missing
-  try {
-    const allBranches = await db.select().from(branches);
-    console.log(`Checking ${BRANCH_DATA.length} branches against database...`);
-    
-    for (let i = 0; i < BRANCH_DATA.length; i++) {
-      const bd = BRANCH_DATA[i];
-      const existing = allBranches.find(ab => ab.brand === bd.brand && ab.branchName === bd.branchName);
-      
-      const { id: _, createdAt: __, ...data } = bd as any;
-      const branchUpdate = {
-        ...data,
-        sortOrder: i + 1
-      };
-
-      if (existing) {
-        // Optional: Only update if something changed, but for sync we can just update
-        await db.update(branches)
-          .set(branchUpdate)
-          .where(eq(branches.id, existing.id));
-      } else {
-        await db.insert(branches).values(branchUpdate);
-      }
-    }
-    console.log("Branch synchronization complete.");
-
-    // Bootstrap tasks
-    const allTasks = await db.select().from(tasks);
-    console.log(`Checking ${TASK_DATA.length} tasks against database...`);
-    for (const t of TASK_DATA) {
-      const existing = allTasks.find(at => at.brand === t.brand && at.branch === t.branch);
-      if (existing) {
-        // Update to restore "old data" defaults
-        await db.update(tasks)
-          .set({
-            status: t.status,
-            location: t.location
-          })
-          .where(eq(tasks.id, existing.id));
-      } else {
-        await db.insert(tasks).values({
-          status: t.status,
-          brand: t.brand,
-          branch: t.branch,
-          location: t.location
-        });
-      }
-    }
-    console.log("Task synchronization complete.");
-  } catch (err) {
-    console.error("Failed to bootstrap data:", err);
-  }
 
   const authorizeManager = (req: any, res: Response, next: NextFunction) => {
     if (req.user?.role !== "admin" && req.user?.role !== "leader" && req.user?.role !== "manager") {
