@@ -1348,6 +1348,10 @@ export default function App() {
     return val || '';
   };
 
+  const tabelContacts = Array.isArray(CONTACTS_DATA.tabel) ? CONTACTS_DATA.tabel : [];
+  const mishmashContacts = Array.isArray(CONTACTS_DATA.mishmash) ? CONTACTS_DATA.mishmash : [];
+  const extensionAgents = Array.isArray(CONTACTS_DATA.extensions?.agents) ? CONTACTS_DATA.extensions.agents : [];
+
   // --- Translatable Helper ---
   const Trans = ({ k, d, isTextArea = false, className = "" }: { k: string, d: string, isTextArea?: boolean, className?: string }) => (
     <EditableText 
@@ -3391,7 +3395,7 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {CONTACTS_DATA.tabel.map((item, idx) => (
+                        {tabelContacts.map((item, idx) => (
                           <tr key={idx} className="hover:bg-yellow-50/30 transition-colors">
                             <td className="px-6 py-4 text-sm font-bold text-gray-900">
                               <EditableText 
@@ -3478,7 +3482,7 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {CONTACTS_DATA.mishmash.map((item, idx) => (
+                        {mishmashContacts.map((item, idx) => (
                           <tr key={idx} className="hover:bg-yellow-50/30 transition-colors">
                             <td className="px-6 py-4 text-sm font-bold text-gray-900">
                               <EditableText 
@@ -5026,7 +5030,7 @@ export default function App() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                          {CONTACTS_DATA.extensions.agents.map((agent: any, idx: number) => (
+                          {extensionAgents.map((agent: any, idx: number) => (
                             <tr key={idx} className="ext-row hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-colors group">
                               <td className="px-6 py-4 text-center">
                                 {agent.ext ? (
