@@ -48,10 +48,12 @@ interface SidebarProps {
   isAdmin: boolean;
   setSelectedBrand: (brand: string | null) => void;
   selectedBrand: string | null;
-  setSelectedAllergenBrand: (brand: 'yelo' | 'bbt' | 'just' | 'slice' | 'chili' | 'pattie') => void;
+  setSelectedAllergenBrand: (brand: 'yelo' | 'bbt' | 'just' | 'slice' | 'chili' | 'pattie' | 'mishmash') => void;
   selectedAllergenBrand: string;
   setSelectedIngerinesBrand: (brand: string) => void;
   selectedIngerinesBrand: string;
+  selectedComplainBrand: string | null;
+  setSelectedComplainBrand: (brand: string | null) => void;
   pinnedViews: string[];
   togglePin: (view: string) => void;
   onSearchOpen: () => void;
@@ -119,6 +121,8 @@ export default function Sidebar({
   selectedAllergenBrand,
   setSelectedIngerinesBrand,
   selectedIngerinesBrand,
+  setSelectedComplainBrand,
+  selectedComplainBrand,
   pinnedViews,
   togglePin,
   onSearchOpen,
@@ -216,7 +220,7 @@ export default function Sidebar({
               {pinnedViews.map(viewId => {
                 const item = ALL_NAV_ITEMS.find(i => i.id === viewId);
                 if (!item) return null;
-                return navItem(item.label, () => item.action(setCurrentView, setSelectedBrand, setSelectedAllergenBrand, setSelectedIngerinesBrand), currentView === item.view && (item.subBrand ? (selectedBrand === item.subBrand || selectedAllergenBrand === item.subBrand || selectedIngerinesBrand === item.subBrand) : true), viewId);
+                return navItem(item.label, () => (item as any).action(setCurrentView, setSelectedBrand, setSelectedAllergenBrand, setSelectedIngerinesBrand, setSelectedComplainBrand), currentView === item.view && (item.subBrand ? (selectedBrand === item.subBrand || selectedAllergenBrand === item.subBrand || selectedIngerinesBrand === item.subBrand || selectedComplainBrand === item.subBrand) : true), viewId);
               })}
             </NavGroup>
             <div className="h-[1px] bg-gray-50 mx-4 my-2" />
@@ -257,6 +261,8 @@ export default function Sidebar({
           {navItem('Pattie Branches', () => { setSelectedBrand('Pattie Pattie'); setCurrentView('branches'); }, currentView === 'branches' && selectedBrand === 'Pattie Pattie', 'brand-pattie')}
           {navItem('Just Branches', () => { setSelectedBrand('Just C'); setCurrentView('branches'); }, currentView === 'branches' && selectedBrand === 'Just C', 'brand-just')}
           {navItem('Chili Branches', () => { setSelectedBrand('Chili pepper'); setCurrentView('branches'); }, currentView === 'branches' && selectedBrand === 'Chili pepper', 'brand-chili')}
+          {navItem('Tabel Branches', () => { setSelectedBrand('Tabel'); setCurrentView('branches'); }, currentView === 'branches' && selectedBrand === 'Tabel', 'brand-tabel')}
+          {navItem('Mishmash Branches', () => { setSelectedBrand('Mishmash'); setCurrentView('branches'); }, currentView === 'branches' && selectedBrand === 'Mishmash', 'brand-mishmash')}
         </NavGroup>
 
         {/* Process */}
@@ -269,6 +275,8 @@ export default function Sidebar({
           {navItem('New Order Process', () => setCurrentView('new-order'), currentView === 'new-order', 'proc-new')}
           {navItem('Follow Up Process', () => setCurrentView('follow-up'), currentView === 'follow-up', 'proc-follow')}
           {navItem('Complain Process', () => setCurrentView('complain'), currentView === 'complain', 'proc-complain')}
+          {navItem('Mishmash Complain', () => { setSelectedComplainBrand('Mishmash'); setCurrentView('complain'); }, currentView === 'complain' && selectedComplainBrand === 'Mishmash', 'proc-complain-mishmash')}
+          {navItem('Tabel Complain', () => { setSelectedComplainBrand('Tabel'); setCurrentView('complain'); }, currentView === 'complain' && selectedComplainBrand === 'Tabel', 'proc-complain-tabel')}
           {navItem('Complaint Status', () => setCurrentView('complaint-status'), currentView === 'complaint-status', 'proc-status')}
           {navItem('Additional', () => setCurrentView('additional'), currentView === 'additional', 'proc-additional')}
           {navItem('Special Requests', () => setCurrentView('special-requests'), currentView === 'special-requests', 'proc-special')}
@@ -319,8 +327,9 @@ export default function Sidebar({
           {navItem('Shakir Contact', () => setCurrentView('shakir-contact'), currentView === 'shakir-contact', 'cont-shakir')}
           {navItem('Yelo Contact', () => setCurrentView('yelo-contact'), currentView === 'yelo-contact', 'cont-yelo')}
           {navItem('BBT Contact', () => setCurrentView('bbt-contact'), currentView === 'bbt-contact', 'cont-bbt')}
+          {navItem('Mishmash Contact', () => setCurrentView('mishmash-contact'), currentView === 'mishmash-contact', 'cont-mishmash')}
+          {navItem('Tabel Contact', () => setCurrentView('tabel-contact'), currentView === 'tabel-contact', 'cont-tabel')}
           {navItem('Users', () => setCurrentView('users-contact'), currentView === 'users-contact', 'cont-users')}
-          {navItem('Extension', () => setCurrentView('extension-contact'), currentView === 'extension-contact', 'cont-ext')}
           {navItem('Employee Ex', () => setCurrentView('employee-ex-contact'), currentView === 'employee-ex-contact', 'cont-emp')}
         </NavGroup>
 
@@ -337,6 +346,7 @@ export default function Sidebar({
           {navItem('Pattie Allergens', () => { setSelectedAllergenBrand('pattie'); setCurrentView('allergens'); }, currentView === 'allergens' && selectedAllergenBrand === 'pattie', 'all-pattie')}
           {navItem('BBT Allergens', () => { setSelectedAllergenBrand('bbt'); setCurrentView('allergens'); }, currentView === 'allergens' && selectedAllergenBrand === 'bbt', 'all-bbt')}
           {navItem('Just Allergens', () => { setSelectedAllergenBrand('just'); setCurrentView('allergens'); }, currentView === 'allergens' && selectedAllergenBrand === 'just', 'all-just')}
+          {navItem('Mishmash Allergens', () => { setSelectedAllergenBrand('mishmash'); setCurrentView('allergens'); }, currentView === 'allergens' && selectedAllergenBrand === 'mishmash', 'all-mishmash')}
         </NavGroup>
 
         {/* Ingredients */}
@@ -473,9 +483,13 @@ const ALL_NAV_ITEMS = [
   { id: 'brand-pattie', label: 'Pattie Branches', view: 'branches', subBrand: 'Pattie Pattie', action: (sV: any, sB: any, sA: any, sI: any) => { sB('Pattie Pattie'); sV('branches'); } },
   { id: 'brand-just', label: 'Just Branches', view: 'branches', subBrand: 'Just C', action: (sV: any, sB: any, sA: any, sI: any) => { sB('Just C'); sV('branches'); } },
   { id: 'brand-chili', label: 'Chili Branches', view: 'branches', subBrand: 'Chili pepper', action: (sV: any, sB: any, sA: any, sI: any) => { sB('Chili pepper'); sV('branches'); } },
+  { id: 'brand-tabel', label: 'Tabel Branches', view: 'branches', subBrand: 'Tabel', action: (sV: any, sB: any, sA: any, sI: any) => { sB('Tabel'); sV('branches'); } },
+  { id: 'brand-mishmash', label: 'Mishmash Branches', view: 'branches', subBrand: 'Mishmash', action: (sV: any, sB: any, sA: any, sI: any) => { sB('Mishmash'); sV('branches'); } },
   { id: 'proc-new', label: 'New Order Process', view: 'new-order', action: (sV: any) => sV('new-order') },
   { id: 'proc-follow', label: 'Follow Up Process', view: 'follow-up', action: (sV: any) => sV('follow-up') },
-  { id: 'proc-complain', label: 'Complain Process', view: 'complain', action: (sV: any) => sV('complain') },
+  { id: 'proc-complain', label: 'Complain Process', view: 'complain', action: (sV: any, sB: any, sA: any, sI: any, sCB: any) => { sCB(null); sV('complain'); } },
+  { id: 'proc-complain-mishmash', label: 'Mishmash Complain', view: 'complain', action: (sV: any, sB: any, sA: any, sI: any, sCB: any) => { sCB('Mishmash'); sV('complain'); } },
+  { id: 'proc-complain-tabel', label: 'Tabel Complain', view: 'complain', action: (sV: any, sB: any, sA: any, sI: any, sCB: any) => { sCB('Tabel'); sV('complain'); } },
   { id: 'proc-status', label: 'Complaint Status', view: 'complaint-status', action: (sV: any) => sV('complaint-status') },
   { id: 'proc-additional', label: 'Additional Process', view: 'additional', action: (sV: any) => sV('additional') },
   { id: 'proc-special', label: 'Special Requests', view: 'special-requests', action: (sV: any) => sV('special-requests') },
@@ -490,8 +504,9 @@ const ALL_NAV_ITEMS = [
   { id: 'cont-shakir', label: 'Shakir Contacts', view: 'shakir-contact', action: (sV: any) => sV('shakir-contact') },
   { id: 'cont-yelo', label: 'Yelo Contacts', view: 'yelo-contact', action: (sV: any) => sV('yelo-contact') },
   { id: 'cont-bbt', label: 'BBT Contacts', view: 'bbt-contact', action: (sV: any) => sV('bbt-contact') },
+  { id: 'cont-mishmash', label: 'Mishmash Contacts', view: 'mishmash-contact', action: (sV: any) => sV('mishmash-contact') },
+  { id: 'cont-tabel', label: 'Tabel Contacts', view: 'tabel-contact', action: (sV: any) => sV('tabel-contact') },
   { id: 'cont-users', label: 'Users System Access', view: 'users-contact', action: (sV: any) => sV('users-contact') },
-  { id: 'cont-ext', label: 'Branch Extensions', view: 'extension-contact', action: (sV: any) => sV('extension-contact') },
   { id: 'cont-emp', label: 'Employee Extensions', view: 'employee-ex-contact', action: (sV: any) => sV('employee-ex-contact') },
   { id: 'all-yelo', label: 'Yelo Allergens', view: 'allergens', subBrand: 'yelo', action: (sV: any, sB: any, sA: any) => { sA('yelo'); sV('allergens'); } },
   { id: 'all-slice', label: 'Slice Allergens', view: 'allergens', subBrand: 'slice', action: (sV: any, sB: any, sA: any) => { sA('slice'); sV('allergens'); } },
@@ -499,6 +514,7 @@ const ALL_NAV_ITEMS = [
   { id: 'all-pattie', label: 'Pattie Allergens', view: 'allergens', subBrand: 'pattie', action: (sV: any, sB: any, sA: any) => { sA('pattie'); sV('allergens'); } },
   { id: 'all-bbt', label: 'BBT Allergens', view: 'allergens', subBrand: 'bbt', action: (sV: any, sB: any, sA: any) => { sA('bbt'); sV('allergens'); } },
   { id: 'all-just', label: 'Just Allergens', view: 'allergens', subBrand: 'just', action: (sV: any, sB: any, sA: any) => { sA('just'); sV('allergens'); } },
+  { id: 'all-mishmash', label: 'Mishmash Allergens', view: 'allergens', subBrand: 'mishmash', action: (sV: any, sB: any, sA: any) => { sA('mishmash'); sV('allergens'); } },
   { id: 'ing-shakir', label: 'Shakir Ingredients', view: 'ingerines', subBrand: 'shakir', action: (sV: any, sB: any, sA: any, sI: any) => { sI('shakir'); sV('ingerines'); } },
   { id: 'ing-just', label: 'Just Ingredients', view: 'ingerines', subBrand: 'just', action: (sV: any, sB: any, sA: any, sI: any) => { sI('just'); sV('ingerines'); } },
   { id: 'ing-yelo-sop', label: 'Yelo SOP', view: 'ingerines', subBrand: 'yelo-sop', action: (sV: any, sB: any, sA: any, sI: any) => { sI('yelo-sop'); sV('ingerines'); } },
