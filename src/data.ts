@@ -2025,6 +2025,8 @@ export const CONTACTS_DATA = {
     { name: "BBT Mangaf", contacts: [{ name: "Jonathan", phone: "55690495" }, { name: "Dennis", phone: "50210441" }] },
     { name: "BBT Sabah Al Ahmad", contacts: [{ name: "Youssef", phone: "66492025" }, { name: "Vhon", phone: "60694381" }] }
   ],
+  tabel: [],
+  mishmash: [],
   platforms: [
     {
       id: 'myFatoora',
@@ -2283,7 +2285,8 @@ export const CONTACTS_DATA = {
       { id: 28, name: "M Ghareeb", ext: "137" },
       { id: 29, name: "Abdullah AlKaabi", ext: "152" },
       { id: 30, name: "Ahmed Ibrahim", ext: "159" }
-    ]
+    ],
+    agents: []
   }
 };
 
@@ -2914,4 +2917,3 @@ export const TASK_DATA = [
   {status:"Available", brand:"BBT", branch:"Sabah Al Ahmed", location:"https://maps.app.goo.gl/XUpqK4NtzvpdTDCX8"},
   {status:"Available", brand:"BBT", branch:"Bayan", location:"https://maps.app.goo.gl/tSw9ZZ5muNLNwsNK9"}
 ];
-
