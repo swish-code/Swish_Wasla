@@ -4796,33 +4796,33 @@ export default function App() {
                 </div>
               </div>
             </motion.div>
-          ) : currentView === 'extension-contact' ? (
+          ) : currentView === 'employee-ex-contact' ? (
             <motion.div
-              key="extension"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.02 }}
+              key="employee-ex"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               className="max-w-6xl mx-auto px-4 pb-20 space-y-8"
             >
-              <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
-                <div className="bg-blue-600 dark:bg-blue-700 p-8 text-white relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-8 opacity-10">
-                    <Phone size={120} />
+              <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-2xl dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
+                <div className="bg-[#2d2942] dark:bg-[#110e1f] p-10 text-white relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-10 opacity-10">
+                    <Users size={120} />
                   </div>
                   <div className="relative z-10">
-                    <h2 className="text-3xl font-black mb-2 uppercase tracking-tight text-white dark:text-gray-100">
+                    <h2 className="text-3xl font-black mb-2 uppercase tracking-tight">
                       <EditableText 
-                        contentKey="extension_title"
-                        defaultValue={t("extension_title", "Branches Extension")}
+                        contentKey="employee_ex_title"
+                        defaultValue={t("employee_ex_title", "Employee & Branches Extensions")}
                         canEdit={canEdit}
                         onSave={handleSaveOverride}
                         onDelete={handleDeleteOverride}
                       />
                     </h2>
-                    <p className="text-blue-100 dark:text-blue-200 font-medium">
+                    <p className="text-blue-100 dark:text-blue-200 font-medium opacity-80">
                       <EditableText 
-                        contentKey="extension_desc"
-                        defaultValue={t("extension_desc", "Internal internal phone system directory")}
+                        contentKey="employee_ex_desc"
+                        defaultValue={t("employee_ex_desc", "Internal staff and branches directory for quick communication")}
                         canEdit={canEdit}
                         onSave={handleSaveOverride}
                         onDelete={handleDeleteOverride}
@@ -4831,239 +4831,36 @@ export default function App() {
                     </p>
                   </div>
                 </div>
-                
-                <div className="p-8">
-                  {/* Search and Table for Branches */}
-                  <div className="mb-8">
-                    <div className="relative max-w-md mb-6">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500" size={20} />
-                      <input 
-                        type="text" 
-                        placeholder="Search by Extension or Name..." 
-                        className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none font-bold text-gray-700 dark:text-gray-200"
-                        onChange={(e) => {
-                          const val = e.target.value.toLowerCase();
-                          const rows = document.querySelectorAll('.branch-row');
-                          rows.forEach((row: any) => {
-                            const text = row.innerText.toLowerCase();
-                            row.style.display = text.includes(val) ? '' : 'none';
-                          });
-                        }}
-                      />
-                    </div>
 
+                <div className="p-8">
+                  {/* Master Search */}
+                  <div className="relative max-w-md mb-8">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                    <input 
+                      type="text" 
+                      placeholder="✍️ Global Extension Search (Name or EXT)..." 
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none font-bold text-gray-700 dark:text-gray-300 dark:placeholder:text-gray-600"
+                      onChange={(e) => {
+                        const val = e.target.value.toLowerCase();
+                        const rows = document.querySelectorAll('.ext-row'); // Use a generic class for all rows
+                        rows.forEach((row: any) => {
+                          const text = row.innerText.toLowerCase();
+                          row.style.display = text.includes(val) ? '' : 'none';
+                        });
+                      }}
+                    />
+                  </div>
+
+                  {/* Employee Table */}
+                  <div className="mb-12">
+                    <h3 className="text-xl font-black text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-3">
+                      <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+                      Staff Directory
+                    </h3>
                     <div className="overflow-hidden border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm dark:shadow-none">
                       <table className="w-full border-collapse">
                         <thead>
                           <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Ext</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Name</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                          {CONTACTS_DATA.extensions.branches.map((item: any, idx: number) => (
-                            <tr key={idx} className="branch-row hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors group">
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <a href={`tel:${item.ext}`} className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-lg font-black text-sm group-hover:bg-blue-600 dark:group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                  <Phone size={12} />
-                                  {item.ext}
-                                </a>
-                              </td>
-                              <td className="px-6 py-4 font-bold text-gray-700 dark:text-gray-300 group-hover:text-blue-900 dark:group-hover:text-blue-400">
-                                <EditableText 
-                                  contentKey={`extension_branch_${idx}_name`}
-                                  defaultValue={t(`extension_branch_${idx}_name`, item.name)}
-                                  canEdit={canEdit}
-                                  onSave={handleSaveOverride}
-                                  onDelete={handleDeleteOverride}
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  {/* Brand Lines Table */}
-                  <div className="mt-12">
-                    <h3 className="text-2xl font-black text-blue-900 mb-6 flex items-center gap-3">
-                      <div className="w-2 h-8 bg-blue-500 rounded-full"></div>
-                      Hotlines & Brand Lines
-                    </h3>
-                    <div className="overflow-hidden border border-gray-100 rounded-3xl shadow-lg">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="bg-blue-900 text-white">
-                            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest">Brand Name</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest text-center">Line EXT</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest">Hotline</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest">Land Line</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                          {CONTACTS_DATA.extensions.brands.map((brand: any, idx: number) => (
-                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-6 py-4 font-black text-gray-800">
-                                <EditableText 
-                                  contentKey={`extension_brand_${idx}_name`}
-                                  defaultValue={t(`extension_brand_${idx}_name`, brand.name)}
-                                  canEdit={canEdit}
-                                  onSave={handleSaveOverride}
-                                  onDelete={handleDeleteOverride}
-                                />
-                              </td>
-                              <td className="px-6 py-4 text-center">
-                                {brand.ext && (
-                                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full font-bold text-xs">
-                                    <EditableText 
-                                      contentKey={`extension_brand_${idx}_ext`}
-                                      defaultValue={t(`extension_brand_${idx}_ext`, brand.ext)}
-                                      canEdit={canEdit}
-                                      onSave={handleSaveOverride}
-                                      onDelete={handleDeleteOverride}
-                                    />
-                                  </span>
-                                )}
-                              </td>
-                              <td className="px-6 py-4">
-                                {brand.hotline && (
-                                  <a href={`tel:${brand.hotline}`} className="text-blue-600 font-bold hover:underline flex items-center gap-2">
-                                    <Phone size={14} />
-                                    <EditableText 
-                                      contentKey={`extension_brand_${idx}_hotline`}
-                                      defaultValue={t(`extension_brand_${idx}_hotline`, brand.hotline)}
-                                      canEdit={canEdit}
-                                      onSave={handleSaveOverride}
-                                      onDelete={handleDeleteOverride}
-                                    />
-                                  </a>
-                                )}
-                              </td>
-                              <td className="px-6 py-4 font-medium text-gray-500 text-sm">
-                                <EditableText 
-                                  contentKey={`extension_brand_${idx}_landline`}
-                                  defaultValue={t(`extension_brand_${idx}_landline`, brand.landline)}
-                                  canEdit={canEdit}
-                                  onSave={handleSaveOverride}
-                                  onDelete={handleDeleteOverride}
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  {/* Agents Extension Numbers */}
-                  <div className="mt-12">
-                    <h3 className="text-2xl font-black text-blue-900 mb-6 flex items-center gap-3">
-                      <div className="w-2 h-8 bg-green-500 rounded-full"></div>
-                      Agents Extension Numbers
-                    </h3>
-                    <div className="overflow-hidden border border-gray-100 rounded-3xl shadow-lg">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="bg-gray-800 text-white">
-                            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest text-center w-32">EXT no.</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-widest">Name</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                          {CONTACTS_DATA.extensions.agents.map((agent: any, idx: number) => (
-                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-6 py-4 text-center">
-                                {agent.ext ? (
-                                  <span className="px-4 py-1 bg-green-100 text-green-700 rounded-lg font-black text-sm">
-                                    <EditableText 
-                                      contentKey={`extension_agent_${idx}_ext`}
-                                      defaultValue={t(`extension_agent_${idx}_ext`, agent.ext)}
-                                      canEdit={canEdit}
-                                      onSave={handleSaveOverride}
-                                      onDelete={handleDeleteOverride}
-                                    />
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-300">—</span>
-                                )}
-                              </td>
-                              <td className="px-6 py-4 font-bold text-gray-700">
-                                <EditableText 
-                                  contentKey={`extension_agent_${idx}_name`}
-                                  defaultValue={t(`extension_agent_${idx}_name`, agent.name)}
-                                  canEdit={canEdit}
-                                  onSave={handleSaveOverride}
-                                  onDelete={handleDeleteOverride}
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ) : currentView === 'employee-ex-contact' ? (
-            <motion.div
-              key="employee-ex"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="max-w-4xl mx-auto px-4 pb-20"
-            >
-                <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-2xl dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
-                  <div className="bg-[#2d2942] dark:bg-[#110e1f] p-10 text-white relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-10 opacity-10">
-                      <Users size={120} />
-                    </div>
-                    <div className="relative z-10">
-                      <h2 className="text-3xl font-black mb-2 uppercase tracking-tight">
-                        <EditableText 
-                          contentKey="employee_ex_title"
-                          defaultValue={t("employee_ex_title", "Employee Extensions Directory")}
-                          canEdit={canEdit}
-                          onSave={handleSaveOverride}
-                          onDelete={handleDeleteOverride}
-                        />
-                      </h2>
-                      <p className="text-blue-100 dark:text-blue-200 font-medium opacity-80">
-                        <EditableText 
-                          contentKey="employee_ex_desc"
-                          defaultValue={t("employee_ex_desc", "Internal staff directory for quick communication")}
-                          canEdit={canEdit}
-                          onSave={handleSaveOverride}
-                          onDelete={handleDeleteOverride}
-                          isTextArea
-                        />
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-8">
-                    <div className="relative max-w-md mb-8">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                      <input 
-                        type="text" 
-                        placeholder="✍️ Search Employee Name..." 
-                        className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none font-bold text-gray-700 dark:text-gray-300 dark:placeholder:text-gray-600"
-                        onChange={(e) => {
-                          const val = e.target.value.toLowerCase();
-                          const rows = document.querySelectorAll('.emp-row');
-                          rows.forEach((row: any) => {
-                            const text = row.innerText.toLowerCase();
-                            row.style.display = text.includes(val) ? '' : 'none';
-                          });
-                        }}
-                      />
-                    </div>
-
-                    <div className="overflow-hidden border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm dark:shadow-none">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-800">
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest w-16">#</th>
                             <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Name</th>
                             <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Extension</th>
@@ -5071,7 +4868,7 @@ export default function App() {
                         </thead>
                         <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                             {CONTACTS_DATA.extensions.employees.map((emp: any, idx: number) => (
-                              <tr key={emp.id} className="emp-row hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors group">
+                              <tr key={emp.id} className="ext-row hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors group">
                                 <td className="px-6 py-4 text-sm font-bold text-gray-400 dark:text-gray-600">{emp.id}</td>
                                 <td className="px-6 py-4 font-bold text-gray-700 dark:text-gray-300 group-hover:text-blue-900 dark:group-hover:text-blue-400">
                                   <EditableText 
@@ -5103,21 +4900,180 @@ export default function App() {
                       </table>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-8 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-6 flex items-start gap-4">
-                  <Info className="text-blue-600 dark:text-blue-400 mt-1" size={24} />
+                  {/* Branches Table */}
+                  <div className="mb-12">
+                    <h3 className="text-xl font-black text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-3">
+                      <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                      Branch Contact List
+                    </h3>
+                    <div className="overflow-hidden border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm dark:shadow-none">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest w-24 text-center">Ext</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Name</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+                          {CONTACTS_DATA.extensions.branches.map((item: any, idx: number) => (
+                            <tr key={idx} className="ext-row hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-colors group">
+                              <td className="px-6 py-4 text-center">
+                                <a href={`tel:${item.ext}`} className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 rounded-lg font-black text-sm group-hover:bg-emerald-600 dark:group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                  <Phone size={12} />
+                                  {item.ext}
+                                </a>
+                              </td>
+                              <td className="px-6 py-4 font-bold text-gray-700 dark:text-gray-300 group-hover:text-emerald-900 dark:group-hover:text-emerald-400">
+                                <EditableText 
+                                  contentKey={`extension_branch_${idx}_name`}
+                                  defaultValue={t(`extension_branch_${idx}_name`, item.name)}
+                                  canEdit={canEdit}
+                                  onSave={handleSaveOverride}
+                                  onDelete={handleDeleteOverride}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Hotlines Table */}
+                  <div className="mb-12">
+                    <h3 className="text-xl font-black text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-3">
+                      <div className="w-1.5 h-6 bg-red-500 rounded-full"></div>
+                      Hotlines & Brand Lines
+                    </h3>
+                    <div className="overflow-hidden border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm dark:shadow-none">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Brand Name</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest text-center">Line EXT</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Hotline</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Land Line</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+                          {CONTACTS_DATA.extensions.brands.map((brand: any, idx: number) => (
+                            <tr key={idx} className="ext-row hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                              <td className="px-6 py-4 font-black text-gray-800 dark:text-gray-200">
+                                <EditableText 
+                                  contentKey={`extension_brand_${idx}_name`}
+                                  defaultValue={t(`extension_brand_${idx}_name`, brand.name)}
+                                  canEdit={canEdit}
+                                  onSave={handleSaveOverride}
+                                  onDelete={handleDeleteOverride}
+                                />
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                {brand.ext && (
+                                  <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-bold text-xs">
+                                    <EditableText 
+                                      contentKey={`extension_brand_${idx}_ext`}
+                                      defaultValue={t(`extension_brand_${idx}_ext`, brand.ext)}
+                                      canEdit={canEdit}
+                                      onSave={handleSaveOverride}
+                                      onDelete={handleDeleteOverride}
+                                    />
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-6 py-4">
+                                {brand.hotline && (
+                                  <a href={`tel:${brand.hotline}`} className="text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-2">
+                                    <Phone size={14} />
+                                    <EditableText 
+                                      contentKey={`extension_brand_${idx}_hotline`}
+                                      defaultValue={t(`extension_brand_${idx}_hotline`, brand.hotline)}
+                                      canEdit={canEdit}
+                                      onSave={handleSaveOverride}
+                                      onDelete={handleDeleteOverride}
+                                    />
+                                  </a>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 font-medium text-gray-500 dark:text-gray-400 text-xs">
+                                <EditableText 
+                                  contentKey={`extension_brand_${idx}_landline`}
+                                  defaultValue={t(`extension_brand_${idx}_landline`, brand.landline)}
+                                  canEdit={canEdit}
+                                  onSave={handleSaveOverride}
+                                  onDelete={handleDeleteOverride}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Agents Extension Numbers */}
                   <div>
-                    <p className="text-blue-900 dark:text-blue-300 font-bold mb-1">
-                      <EditableText 
-                        contentKey="employee_ex_note_title"
-                        defaultValue={t("employee_ex_note_title", "Confidential Information")}
-                        canEdit={canEdit}
-                        onSave={handleSaveOverride}
-                        onDelete={handleDeleteOverride}
-                      />
-                    </p>
-                    <p className="text-sm text-blue-700 dark:text-blue-400/80">
+                    <h3 className="text-xl font-black text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-3">
+                      <div className="w-1.5 h-6 bg-purple-500 rounded-full"></div>
+                      Agents Contact Numbers
+                    </h3>
+                    <div className="overflow-hidden border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm dark:shadow-none">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest text-center w-32">EXT no.</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Name</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+                          {CONTACTS_DATA.extensions.agents.map((agent: any, idx: number) => (
+                            <tr key={idx} className="ext-row hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-colors group">
+                              <td className="px-6 py-4 text-center">
+                                {agent.ext ? (
+                                  <span className="px-4 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded-lg font-black text-sm">
+                                    <EditableText 
+                                      contentKey={`extension_agent_${idx}_ext`}
+                                      defaultValue={t(`extension_agent_${idx}_ext`, agent.ext)}
+                                      canEdit={canEdit}
+                                      onSave={handleSaveOverride}
+                                      onDelete={handleDeleteOverride}
+                                    />
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-300 dark:text-gray-700">—</span>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 font-bold text-gray-700 dark:text-gray-300 group-hover:text-purple-900 dark:group-hover:text-purple-400">
+                                <EditableText 
+                                  contentKey={`extension_agent_${idx}_name`}
+                                  defaultValue={t(`extension_agent_${idx}_name`, agent.name)}
+                                  canEdit={canEdit}
+                                  onSave={handleSaveOverride}
+                                  onDelete={handleDeleteOverride}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-6 flex items-start gap-4">
+                <Info className="text-blue-600 dark:text-blue-400 mt-1" size={24} />
+                <div>
+                  <p className="text-blue-900 dark:text-blue-300 font-bold mb-1">
+                    <EditableText 
+                      contentKey="employee_ex_note_title"
+                      defaultValue={t("employee_ex_note_title", "Confidential Information")}
+                      canEdit={canEdit}
+                      onSave={handleSaveOverride}
+                      onDelete={handleDeleteOverride}
+                    />
+                  </p>
+                  <p className="text-sm text-blue-700 dark:text-blue-400/80">
                     <EditableText 
                       contentKey="employee_ex_note_desc"
                       defaultValue={t("employee_ex_note_desc", "This directory is for internal use only. Do not share these extensions with external parties.")}
