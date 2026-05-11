@@ -49,8 +49,6 @@ const GlobalSearch = ({
       { id: 'proc-new', label: 'New Order Process', view: 'new-order', keywords: 'new order طلب جديد سكريبت' },
       { id: 'proc-follow', label: 'Follow Up Process', view: 'follow-up', keywords: 'follow up متابعة استلام' },
       { id: 'proc-complain', label: 'Complain Process', view: 'complain', keywords: 'complain شكوى مشكلة' },
-      { id: 'proc-complain-mishmash', label: 'Mishmash Complain', view: 'complain', complainBrand: 'Mishmash', keywords: 'mishmash complain شكوى مشماش' },
-      { id: 'proc-complain-tabel', label: 'Tabel Complain', view: 'complain', complainBrand: 'Tabel', keywords: 'tabel complain شكوى تابل' },
       { id: 'proc-status', label: 'Complaint Status', view: 'complaint-status', keywords: 'status حالة شكوى' },
       { id: 'proc-additional', label: 'Additional Process', view: 'additional', keywords: 'additional اضافة زيادة' },
       { id: 'serv-meat', label: 'Meat Sources', view: 'meat-sources', keywords: 'meat sources مصادر اللحوم' },
@@ -97,7 +95,7 @@ const GlobalSearch = ({
     });
 
     // 3. Search Extensions
-    CONTACTS_DATA.extensions.branches.forEach(ext => {
+    (CONTACTS_DATA.extensions?.branches || []).forEach(ext => {
       const eName = ext.name || '';
       const eExt = ext.ext || '';
       if (eName.toLowerCase().includes(q) || eExt.toLowerCase().includes(q)) {
@@ -110,7 +108,7 @@ const GlobalSearch = ({
       }
     });
 
-    CONTACTS_DATA.extensions.employees.forEach(emp => {
+    (CONTACTS_DATA.extensions?.employees || []).forEach(emp => {
       const empName = emp.name || '';
       const empExt = emp.ext || '';
       if (empName.toLowerCase().includes(q) || empExt.toLowerCase().includes(q)) {
@@ -879,6 +877,7 @@ export default function App() {
 
   const [usersData, setUsersData] = useState<UserType[]>([]);
   const [isUsersLoading, setIsUsersLoading] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<number | null>(null);
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserName, setNewUserName] = useState('');
@@ -1228,8 +1227,11 @@ export default function App() {
     setUserMgmtError('');
     setIsCreatingUser(true);
     try {
-      const res = await fetch('/api/users', {
-        method: 'POST',
+      const url = editingUserId ? `/api/users/${editingUserId}` : '/api/users';
+      const method = editingUserId ? 'PUT' : 'POST';
+      
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: newUserEmail,
@@ -1244,16 +1246,30 @@ export default function App() {
         setNewUserPassword('');
         setNewUserName('');
         setNewUserRole('employee');
+        setEditingUserId(null);
         fetchData();
+        // Fetch updated users list explicitly too
+        fetch('/api/users', { credentials: 'include' })
+          .then(r => r.json())
+          .then(data => setUsersData(data));
       } else {
         const err = await res.json();
-        setUserMgmtError(err.error || 'Failed to create user');
+        setUserMgmtError(err.error || `Failed to ${editingUserId ? 'update' : 'create'} user`);
       }
     } catch (err) {
       setUserMgmtError('Server error');
     } finally {
       setIsCreatingUser(false);
     }
+  };
+
+  const handleEditUser = (user: UserType) => {
+    setEditingUserId(user.id);
+    setNewUserEmail(user.email);
+    setNewUserPassword(''); 
+    setNewUserName(user.name);
+    setNewUserRole(user.role as any);
+    window.scrollTo({ top: 400, behavior: 'smooth' });
   };
 
   const handleDeleteUser = async (id: number) => {
@@ -1347,10 +1363,6 @@ export default function App() {
     const val = contentOverrides[key] !== undefined ? contentOverrides[key] : defaultValue;
     return val || '';
   };
-
-  const tabelContacts = Array.isArray(CONTACTS_DATA.tabel) ? CONTACTS_DATA.tabel : [];
-  const mishmashContacts = Array.isArray(CONTACTS_DATA.mishmash) ? CONTACTS_DATA.mishmash : [];
-  const extensionAgents = Array.isArray(CONTACTS_DATA.extensions?.agents) ? CONTACTS_DATA.extensions.agents : [];
 
   // --- Translatable Helper ---
   const Trans = ({ k, d, isTextArea = false, className = "" }: { k: string, d: string, isTextArea?: boolean, className?: string }) => (
@@ -1645,7 +1657,7 @@ export default function App() {
                     className="lg:hidden flex items-center gap-4 mb-12"
                   >
                     <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center font-black text-2xl text-white">W</div>
-                    <span className="text-2xl font-black tracking-tight dark:text-white">WASLA</span>
+                    <span className="text-2xl font-black tracking-tight dark:text-white uppercase italic">WASLA ENTERPRISE Swish KNOWLEDGE base</span>
                   </motion.div>
 
                   <div className="mb-12">
@@ -1743,7 +1755,7 @@ export default function App() {
                   className="mt-20 pt-10 border-t border-gray-100 dark:border-white/5 flex items-center justify-between"
                 >
                   <p className="text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] max-w-[150px] leading-relaxed">
-                    Secure environment<br/>© 2026 WASLA SYSTEMS
+                    Secure environment<br/>© 2026 WASLA ENTERPRISE Swish KNOWLEDGE base
                   </p>
                   <button className="flex items-center gap-2 group">
                     <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest group-hover:underline">Arabic Interface</span>
@@ -3054,6 +3066,38 @@ export default function App() {
                             </div>
                           </div>
                         ))}
+                        
+                        {/* Render extra terms added by admin */}
+                        {Array.from({ length: parseInt(t(`catering_${selectedCateringBrand}_extra_terms_count`, '0')) }).map((_, idx) => (
+                          <div key={`extra_${idx}`} className="flex items-start gap-5 group/term">
+                            <div className="mt-1 flex-shrink-0 w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shadow-sm text-orange-600 border border-orange-200 dark:border-orange-800 transition-transform">
+                              <Plus size={20} />
+                            </div>
+                            <div className="text-gray-600 dark:text-gray-400 font-medium text-lg pt-1 leading-relaxed flex-grow">
+                               <EditableText 
+                                 contentKey={`catering_${selectedCateringBrand}_extra_term_${idx}`}
+                                 defaultValue={t(`catering_${selectedCateringBrand}_extra_term_${idx}`, 'New Item')}
+                                 canEdit={canEdit}
+                                 onSave={handleSaveOverride}
+                                 onDelete={handleDeleteOverride}
+                               />
+                            </div>
+                          </div>
+                        ))}
+
+                        {canEdit && (
+                          <button
+                            onClick={() => {
+                              const currentCount = parseInt(t(`catering_${selectedCateringBrand}_extra_terms_count`, '0'));
+                              handleSaveOverride(`catering_${selectedCateringBrand}_extra_terms_count`, (currentCount + 1).toString());
+                              handleSaveOverride(`catering_${selectedCateringBrand}_extra_term_${currentCount}`, 'New Term Item');
+                            }}
+                            className="w-full py-4 border-2 border-dashed border-orange-200 dark:border-orange-900/30 rounded-2xl text-orange-600 font-black text-sm hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-all flex items-center justify-center gap-2"
+                          >
+                            <Plus size={18} />
+                            Add New Term Line
+                          </button>
+                        )}
                       </div>
                     </div>
                     
@@ -3395,7 +3439,7 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {tabelContacts.map((item, idx) => (
+                        {CONTACTS_DATA.tabel.map((item, idx) => (
                           <tr key={idx} className="hover:bg-yellow-50/30 transition-colors">
                             <td className="px-6 py-4 text-sm font-bold text-gray-900">
                               <EditableText 
@@ -3482,7 +3526,7 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {mishmashContacts.map((item, idx) => (
+                        {CONTACTS_DATA.mishmash.map((item, idx) => (
                           <tr key={idx} className="hover:bg-yellow-50/30 transition-colors">
                             <td className="px-6 py-4 text-sm font-bold text-gray-900">
                               <EditableText 
@@ -4575,11 +4619,25 @@ export default function App() {
                 {/* User Creation Form */}
                 <div className="lg:col-span-1">
                   <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl dark:shadow-none border border-gray-100 dark:border-gray-800 overflow-hidden">
-                    <div className="bg-blue-600 dark:bg-blue-700 p-6">
+                    <div className="bg-blue-600 dark:bg-blue-700 p-6 flex justify-between items-center">
                       <h3 className="text-white font-black text-xl uppercase tracking-tight flex items-center gap-2">
-                        <Plus size={20} />
-                        Create New User
+                        {editingUserId ? <Edit size={20} /> : <Plus size={20} />}
+                        {editingUserId ? 'Edit User' : 'Create New User'}
                       </h3>
+                      {editingUserId && (
+                        <button 
+                          onClick={() => {
+                            setEditingUserId(null);
+                            setNewUserEmail('');
+                            setNewUserPassword('');
+                            setNewUserName('');
+                            setNewUserRole('employee');
+                          }}
+                          className="text-white/70 hover:text-white transition-colors"
+                        >
+                          <X size={20} />
+                        </button>
+                      )}
                     </div>
                     <form onSubmit={handleCreateUser} className="p-8 space-y-4">
                       {userMgmtError && (
@@ -4614,14 +4672,16 @@ export default function App() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest pl-2">Password</label>
+                        <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest pl-2">
+                          {editingUserId ? 'New Password (Leave blank to keep current)' : 'Password'}
+                        </label>
                         <input
                           type="password"
-                          required
+                          required={!editingUserId}
                           value={newUserPassword}
                           onChange={(e) => setNewUserPassword(e.target.value)}
                           className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-4 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:text-gray-200"
-                          placeholder="••••••••"
+                          placeholder={editingUserId ? "Leave blank to keep current" : "••••••••"}
                         />
                       </div>
 
@@ -4676,7 +4736,7 @@ export default function App() {
                         disabled={isCreatingUser}
                         className="w-full bg-blue-600 text-white p-4 rounded-2xl font-black uppercase text-sm tracking-tighter hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 dark:shadow-none disabled:opacity-50"
                       >
-                        {isCreatingUser ? 'Processing...' : 'Generate New Account'}
+                        {isCreatingUser ? 'Processing...' : (editingUserId ? 'Update Account' : 'Generate New Account')}
                       </button>
                     </form>
                   </div>
@@ -4734,14 +4794,26 @@ export default function App() {
                             }`}>
                               {user.role}
                             </span>
-                            {user.role !== 'admin' && (
-                              <button 
-                                onClick={() => handleDeleteUser(user.id)}
-                                className="p-3 text-red-100 dark:text-red-900 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            )}
+                            <div className="flex items-center gap-2">
+                              {user.role !== 'admin' && (
+                                <button 
+                                  onClick={() => handleEditUser(user)}
+                                  className="p-3 text-blue-100 dark:text-blue-900 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/10 rounded-xl"
+                                  title="Edit User"
+                                >
+                                  <Edit size={18} />
+                                </button>
+                              )}
+                              {user.role !== 'admin' && (
+                                <button 
+                                  onClick={() => handleDeleteUser(user.id)}
+                                  className="p-3 text-red-100 dark:text-red-900 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl"
+                                  title="Delete User"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -4871,7 +4943,7 @@ export default function App() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                            {CONTACTS_DATA.extensions.employees.map((emp: any, idx: number) => (
+                            {(CONTACTS_DATA.extensions?.employees || []).map((emp: any, idx: number) => (
                               <tr key={emp.id} className="ext-row hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors group">
                                 <td className="px-6 py-4 text-sm font-bold text-gray-400 dark:text-gray-600">{emp.id}</td>
                                 <td className="px-6 py-4 font-bold text-gray-700 dark:text-gray-300 group-hover:text-blue-900 dark:group-hover:text-blue-400">
@@ -4920,7 +4992,7 @@ export default function App() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                          {CONTACTS_DATA.extensions.branches.map((item: any, idx: number) => (
+                          {(CONTACTS_DATA.extensions?.branches || []).map((item: any, idx: number) => (
                             <tr key={idx} className="ext-row hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-colors group">
                               <td className="px-6 py-4 text-center">
                                 <a href={`tel:${item.ext}`} className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 rounded-lg font-black text-sm group-hover:bg-emerald-600 dark:group-hover:bg-emerald-500 group-hover:text-white transition-colors">
@@ -4961,7 +5033,7 @@ export default function App() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                          {CONTACTS_DATA.extensions.brands.map((brand: any, idx: number) => (
+                          {(CONTACTS_DATA.extensions?.brands || []).map((brand: any, idx: number) => (
                             <tr key={idx} className="ext-row hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                               <td className="px-6 py-4 font-black text-gray-800 dark:text-gray-200">
                                 <EditableText 
@@ -5030,7 +5102,7 @@ export default function App() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                          {extensionAgents.map((agent: any, idx: number) => (
+                          {(CONTACTS_DATA.extensions?.agents || []).map((agent: any, idx: number) => (
                             <tr key={idx} className="ext-row hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-colors group">
                               <td className="px-6 py-4 text-center">
                                 {agent.ext ? (
@@ -5292,14 +5364,32 @@ export default function App() {
                           <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400 text-sm">
                             {idx + 1}
                           </div>
-                          {item.title}
+                          <EditableText
+                            contentKey={`ing_${selectedIngerinesBrand}_${idx}_title`}
+                            defaultValue={t(`ing_${selectedIngerinesBrand}_${idx}_title`, item.title)}
+                            canEdit={canEdit}
+                            onSave={handleSaveOverride}
+                            onDelete={handleDeleteOverride}
+                          />
                         </h3>
                         <p className="text-gray-700 dark:text-gray-300 font-bold leading-relaxed mb-4" dir="auto">
-                          {item.content}
+                          <EditableText
+                            contentKey={`ing_${selectedIngerinesBrand}_${idx}_content`}
+                            defaultValue={t(`ing_${selectedIngerinesBrand}_${idx}_content`, item.content)}
+                            canEdit={canEdit}
+                            onSave={handleSaveOverride}
+                            onDelete={handleDeleteOverride}
+                          />
                         </p>
                         {item.details && (
                           <div className="text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-3 rounded-xl italic">
-                            {item.details}
+                            <EditableText
+                              contentKey={`ing_${selectedIngerinesBrand}_${idx}_details`}
+                              defaultValue={t(`ing_${selectedIngerinesBrand}_${idx}_details`, item.details)}
+                              canEdit={canEdit}
+                              onSave={handleSaveOverride}
+                              onDelete={handleDeleteOverride}
+                            />
                           </div>
                         )}
                         {item.list && (
@@ -5307,13 +5397,137 @@ export default function App() {
                             {item.list.map((listItem: string, lIdx: number) => (
                               <li key={lIdx} className="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-2 rounded-lg">
                                 <ChevronDown className="text-blue-400 rotate-[-90deg]" size={14} />
-                                {listItem}
+                                <EditableText
+                                  contentKey={`ing_${selectedIngerinesBrand}_${idx}_list_${lIdx}`}
+                                  defaultValue={t(`ing_${selectedIngerinesBrand}_${idx}_list_${lIdx}`, listItem)}
+                                  canEdit={canEdit}
+                                  onSave={handleSaveOverride}
+                                  onDelete={handleDeleteOverride}
+                                />
                               </li>
                             ))}
                           </ul>
                         )}
+                        
+                        {/* Extra points for existing cards */}
+                        <ul className="mt-2 space-y-2">
+                           {Array.from({ length: parseInt(t(`ing_${selectedIngerinesBrand}_${idx}_extra_list_count`, '0')) }).map((_, lIdx) => (
+                             <li key={lIdx} className="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-2 rounded-lg">
+                               <ChevronDown className="text-blue-400 rotate-[-90deg]" size={14} />
+                               <EditableText
+                                 contentKey={`ing_${selectedIngerinesBrand}_${idx}_extra_list_${lIdx}`}
+                                 defaultValue={t(`ing_${selectedIngerinesBrand}_${idx}_extra_list_${lIdx}`, 'New point')}
+                                 canEdit={canEdit}
+                                 onSave={handleSaveOverride}
+                                 onDelete={handleDeleteOverride}
+                               />
+                             </li>
+                           ))}
+                        </ul>
+                        {canEdit && (
+                          <button
+                            onClick={() => {
+                              const currentCount = parseInt(t(`ing_${selectedIngerinesBrand}_${idx}_extra_list_count`, '0'));
+                              handleSaveOverride(`ing_${selectedIngerinesBrand}_${idx}_extra_list_count`, (currentCount + 1).toString());
+                              handleSaveOverride(`ing_${selectedIngerinesBrand}_${idx}_extra_list_${currentCount}`, 'New Instruction');
+                            }}
+                            className="mt-4 w-full py-2 border border-dashed border-blue-200 dark:border-blue-800 rounded-xl text-blue-500 font-bold text-xs hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex items-center justify-center gap-2"
+                          >
+                            <Plus size={14} />
+                            Add Point
+                          </button>
+                        )}
                       </motion.div>
                     ))}
+
+                    {/* Extra Dynamically Added Ingredient Cards */}
+                    {Array.from({ length: parseInt(t(`ing_${selectedIngerinesBrand}_extra_items_count`, '0')) }).map((_, extraIdx) => (
+                      <motion.div 
+                        key={`extra-${extraIdx}`}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-3xl p-6 hover:shadow-xl dark:hover:bg-gray-800 hover:bg-white hover:border-blue-200 dark:hover:border-blue-900/30 transition-all group"
+                      >
+                        <h3 className="text-lg font-black text-blue-900 dark:text-blue-400 mb-3 flex items-center gap-2 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">
+                          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400 text-sm">
+                            {INGERINES_DATA[selectedIngerinesBrand as keyof typeof INGERINES_DATA].items.length + extraIdx + 1}
+                          </div>
+                          <EditableText
+                            contentKey={`ing_${selectedIngerinesBrand}_extra_${extraIdx}_title`}
+                            defaultValue={t(`ing_${selectedIngerinesBrand}_extra_${extraIdx}_title`, 'New Item')}
+                            canEdit={canEdit}
+                            onSave={handleSaveOverride}
+                            onDelete={handleDeleteOverride}
+                          />
+                        </h3>
+                        <p className="text-gray-700 dark:text-gray-300 font-bold leading-relaxed mb-4" dir="auto">
+                          <EditableText
+                            contentKey={`ing_${selectedIngerinesBrand}_extra_${extraIdx}_content`}
+                            defaultValue={t(`ing_${selectedIngerinesBrand}_extra_${extraIdx}_content`, 'Description text...')}
+                            canEdit={canEdit}
+                            onSave={handleSaveOverride}
+                            onDelete={handleDeleteOverride}
+                          />
+                        </p>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-3 rounded-xl italic mb-4">
+                          <EditableText
+                            contentKey={`ing_${selectedIngerinesBrand}_extra_${extraIdx}_details`}
+                            defaultValue={t(`ing_${selectedIngerinesBrand}_extra_${extraIdx}_details`, 'Details...')}
+                            canEdit={canEdit}
+                            onSave={handleSaveOverride}
+                            onDelete={handleDeleteOverride}
+                          />
+                        </div>
+                        
+                        <ul className="space-y-2">
+                            {Array.from({ length: parseInt(t(`ing_${selectedIngerinesBrand}_extra_${extraIdx}_list_count`, '0')) }).map((_, lIdx) => (
+                              <li key={lIdx} className="flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-2 rounded-lg">
+                                <ChevronDown className="text-blue-400 rotate-[-90deg]" size={14} />
+                                <EditableText
+                                  contentKey={`ing_${selectedIngerinesBrand}_extra_${extraIdx}_list_${lIdx}`}
+                                  defaultValue={t(`ing_${selectedIngerinesBrand}_extra_${extraIdx}_list_${lIdx}`, 'New point')}
+                                  canEdit={canEdit}
+                                  onSave={handleSaveOverride}
+                                  onDelete={handleDeleteOverride}
+                                />
+                              </li>
+                            ))}
+                        </ul>
+                        
+                        {canEdit && (
+                          <button
+                            onClick={() => {
+                              const currentCount = parseInt(t(`ing_${selectedIngerinesBrand}_extra_${extraIdx}_list_count`, '0'));
+                              handleSaveOverride(`ing_${selectedIngerinesBrand}_extra_${extraIdx}_list_count`, (currentCount + 1).toString());
+                              handleSaveOverride(`ing_${selectedIngerinesBrand}_extra_${extraIdx}_list_${currentCount}`, 'New Instruction');
+                            }}
+                            className="mt-4 w-full py-2 border border-dashed border-blue-200 dark:border-blue-800 rounded-xl text-blue-500 font-bold text-xs hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex items-center justify-center gap-2"
+                          >
+                            <Plus size={14} />
+                            Add Point
+                          </button>
+                        )}
+                      </motion.div>
+                    ))}
+
+                    {canEdit && (
+                      <div className="lg:col-span-1">
+                        <button
+                          onClick={() => {
+                            const currentCount = parseInt(t(`ing_${selectedIngerinesBrand}_extra_items_count`, '0'));
+                            handleSaveOverride(`ing_${selectedIngerinesBrand}_extra_items_count`, (currentCount + 1).toString());
+                            handleSaveOverride(`ing_${selectedIngerinesBrand}_extra_${currentCount}_title`, 'New Product');
+                            handleSaveOverride(`ing_${selectedIngerinesBrand}_extra_${currentCount}_content`, 'Product description');
+                          }}
+                          className="w-full h-full min-h-[200px] border-2 border-dashed border-blue-200 dark:border-blue-900/30 rounded-3xl flex flex-col items-center justify-center gap-4 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group"
+                        >
+                          <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Plus size={24} />
+                          </div>
+                          <span className="font-black text-xs uppercase tracking-widest">Add New Ingredient Card</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -5392,21 +5606,81 @@ export default function App() {
                           ?.items.map((item: any) => (
                           <tr key={item.id} className="allergen-row hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors group">
                             <td className="px-6 py-4 text-sm font-bold text-gray-400 dark:text-gray-600">{item.id}</td>
-                            <td className="px-6 py-4 font-bold text-gray-700 dark:text-gray-300 group-hover:text-red-900 dark:group-hover:text-red-400">{item.name}</td>
+                            <td className="px-6 py-4 font-bold text-gray-700 dark:text-gray-300 group-hover:text-red-900 dark:group-hover:text-red-400">
+                              <EditableText 
+                                contentKey={`allergen_${selectedAllergenBrand}_${item.id}_name`}
+                                defaultValue={t(`allergen_${selectedAllergenBrand}_${item.id}_name`, item.name)}
+                                canEdit={canEdit}
+                                onSave={handleSaveOverride}
+                                onDelete={handleDeleteOverride}
+                              />
+                            </td>
                             <td className="px-6 py-4 text-sm font-medium text-gray-600 dark:text-gray-400">
                               <div className="flex flex-wrap gap-1">
-                                {item.allergens.split(/,\s*/).map((allergen: string) => (
+                                {t(`allergen_${selectedAllergenBrand}_${item.id}_list`, item.allergens).split(/,\s*/).map((allergen: string) => (
                                   <span key={allergen} className="px-2 py-0.5 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded text-[10px] font-black uppercase">
                                     {allergen}
                                   </span>
                                 ))}
+                                {canEdit && (
+                                   <EditableText 
+                                     contentKey={`allergen_${selectedAllergenBrand}_${item.id}_list`}
+                                     defaultValue={t(`allergen_${selectedAllergenBrand}_${item.id}_list`, item.allergens)}
+                                     canEdit={canEdit}
+                                     onSave={handleSaveOverride}
+                                     onDelete={handleDeleteOverride}
+                                   />
+                                )}
                               </div>
                             </td>
                           </tr>
                         ))}
+
+                        {/* Dynamically Added Allergen Rows */}
+                        {Array.from({ length: parseInt(t(`allergen_${selectedAllergenBrand}_${selectedAllergenCategory || ALLERGEN_DATA[selectedAllergenBrand as keyof typeof ALLERGEN_DATA].categories[0].id}_extra_count`, '0')) }).map((_, extraIdx) => (
+                           <tr key={`extra-${extraIdx}`} className="allergen-row hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors group">
+                             <td className="px-6 py-4 text-sm font-bold text-gray-400 dark:text-gray-600">
+                               +
+                             </td>
+                             <td className="px-6 py-4 font-bold text-gray-700 dark:text-gray-300">
+                               <EditableText 
+                                 contentKey={`allergen_${selectedAllergenBrand}_${selectedAllergenCategory || ALLERGEN_DATA[selectedAllergenBrand as keyof typeof ALLERGEN_DATA].categories[0].id}_extra_${extraIdx}_name`}
+                                 defaultValue={t(`allergen_${selectedAllergenBrand}_${selectedAllergenCategory || ALLERGEN_DATA[selectedAllergenBrand as keyof typeof ALLERGEN_DATA].categories[0].id}_extra_${extraIdx}_name`, 'New Item')}
+                                 canEdit={canEdit}
+                                 onSave={handleSaveOverride}
+                                 onDelete={handleDeleteOverride}
+                               />
+                             </td>
+                             <td className="px-6 py-4 text-sm font-medium">
+                               <EditableText 
+                                 contentKey={`allergen_${selectedAllergenBrand}_${selectedAllergenCategory || ALLERGEN_DATA[selectedAllergenBrand as keyof typeof ALLERGEN_DATA].categories[0].id}_extra_${extraIdx}_list`}
+                                 defaultValue={t(`allergen_${selectedAllergenBrand}_${selectedAllergenCategory || ALLERGEN_DATA[selectedAllergenBrand as keyof typeof ALLERGEN_DATA].categories[0].id}_extra_${extraIdx}_list`, 'Allergens...')}
+                                 canEdit={canEdit}
+                                 onSave={handleSaveOverride}
+                                 onDelete={handleDeleteOverride}
+                               />
+                             </td>
+                           </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
+                  
+                  {canEdit && (
+                    <button
+                      onClick={() => {
+                        const catId = selectedAllergenCategory || ALLERGEN_DATA[selectedAllergenBrand as keyof typeof ALLERGEN_DATA].categories[0].id;
+                        const currentCount = parseInt(t(`allergen_${selectedAllergenBrand}_${catId}_extra_count`, '0'));
+                        handleSaveOverride(`allergen_${selectedAllergenBrand}_${catId}_extra_count`, (currentCount + 1).toString());
+                        handleSaveOverride(`allergen_${selectedAllergenBrand}_${catId}_extra_${currentCount}_name`, 'New Item Name');
+                        handleSaveOverride(`allergen_${selectedAllergenBrand}_${catId}_extra_${currentCount}_list`, 'None');
+                      }}
+                      className="mt-4 w-full py-3 border-2 border-dashed border-red-200 dark:border-red-900/30 rounded-xl text-red-600 font-black text-sm hover:bg-red-50 dark:hover:bg-red-900/10 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Plus size={18} />
+                      Add New Item Row
+                    </button>
+                  )}
                 </div>
               </div>
 
