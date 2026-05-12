@@ -33,7 +33,9 @@ import {
   Truck,
   Skull,
   UserCircle,
-  Star
+  Star,
+  Menu,
+  ChevronLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ViewType, User } from '../types';
@@ -59,6 +61,8 @@ interface SidebarProps {
   onSearchOpen: () => void;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 interface NavGroupProps {
@@ -69,28 +73,33 @@ interface NavGroupProps {
   children: React.ReactNode;
 }
 
-const NavGroup = ({ label, icon: Icon, isOpen, onToggle, children }: NavGroupProps) => {
+const NavGroup = ({ label, icon: Icon, isOpen, onToggle, children, isCollapsed }: NavGroupProps & { isCollapsed?: boolean }) => {
   return (
     <div className="py-1">
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between py-2.5 px-4 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all group"
+        title={isCollapsed ? label : undefined}
+        className={`w-full flex items-center justify-between py-2.5 px-4 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all group ${
+          isCollapsed ? 'justify-center px-0' : ''
+        }`}
       >
-        <div className="flex items-center gap-3">
+        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
           <div className="p-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-700 transition-colors">
             <Icon size={16} />
           </div>
-          <span className="text-[13px] font-bold text-gray-700 dark:text-gray-300">{label}</span>
+          {!isCollapsed && <span className="text-[13px] font-bold text-gray-700 dark:text-gray-300 truncate">{label}</span>}
         </div>
-        <motion.div
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <ChevronDown size={14} className="text-gray-400" />
-        </motion.div>
+        {!isCollapsed && (
+          <motion.div
+            animate={{ rotate: isOpen ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ChevronDown size={14} className="text-gray-400" />
+          </motion.div>
+        )}
       </button>
       <AnimatePresence initial={false}>
-        {isOpen && (
+        {isOpen && !isCollapsed && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -127,7 +136,9 @@ export default function Sidebar({
   togglePin,
   onSearchOpen,
   isDarkMode,
-  onToggleDarkMode
+  onToggleDarkMode,
+  isCollapsed,
+  onToggleCollapse
 }: SidebarProps) {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     brands: true,
@@ -146,15 +157,25 @@ export default function Sidebar({
           isActive 
             ? 'bg-[#00965e]/10 text-[#00965e]' 
             : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white group-hover/item:text-gray-900 dark:group-hover/item:text-white'
-        }`}
+        } ${isCollapsed ? 'justify-center' : ''}`}
       >
         <button 
           onClick={onClick}
-          className="flex-1 text-left flex items-center h-full outline-none"
+          title={isCollapsed ? label : undefined}
+          className={`flex-1 text-left flex items-center h-full outline-none ${isCollapsed ? 'hidden' : ''}`}
         >
           {label}
         </button>
-        {viewId && (
+        {isCollapsed && (
+          <button 
+            onClick={onClick}
+            className="w-full flex justify-center py-1"
+            title={label}
+          >
+            <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#00965e]' : 'bg-gray-300 dark:bg-gray-700'}`} />
+          </button>
+        )}
+        {!isCollapsed && viewId && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -168,44 +189,82 @@ export default function Sidebar({
           </button>
         )}
       </div>
+      
+      {/* Collapsed Tooltip */}
+      {isCollapsed && (
+        <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 pointer-events-none group-hover/item:opacity-100 transition-opacity whitespace-nowrap z-[100] font-black uppercase tracking-widest shadow-xl border border-white/10">
+          {label}
+          <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-gray-900" />
+        </div>
+      )}
     </div>
   );
 
   return (
     <aside 
-      className={`fixed inset-y-0 left-0 lg:sticky lg:top-0 w-72 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col h-screen z-[80] transition-transform duration-300 transform ${
+      className={`fixed inset-y-0 left-0 lg:sticky lg:top-0 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col h-screen z-[80] transition-all duration-300 ease-in-out transform ${
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      }`}
+      } ${isCollapsed ? 'w-20' : 'w-72'}`}
     >
       {/* Logo & Close Button */}
-      <div className="p-8 flex items-center justify-between pb-6 border-b border-gray-50 dark:border-gray-800">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-[#00965e] font-black text-2xl shadow-xl shadow-green-100/20 dark:shadow-none border border-gray-100 dark:border-gray-700">
+      <div className={`p-4 lg:p-8 flex items-center justify-between pb-6 border-b border-gray-50 dark:border-gray-800 h-[100px] transition-all ${isCollapsed ? 'p-4 justify-center' : ''}`}>
+        <div className={`flex items-center gap-3 transition-all ${isCollapsed ? 'gap-0' : ''}`}>
+          <div className={`flex-shrink-0 transition-all ${isCollapsed ? 'w-10 h-10 text-xl' : 'w-12 h-12 text-2xl'} bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-[#00965e] font-black shadow-xl shadow-green-100/20 dark:shadow-none border border-gray-100 dark:border-gray-700`}>
             W
           </div>
-          <div>
-            <h1 className="text-xl font-black text-gray-900 dark:text-white tracking-tighter leading-none">Swish Wasla</h1>
-            <span className="text-[10px] font-black text-[#00965e] uppercase tracking-widest mt-1 block">Knowledge Base</span>
-          </div>
+          {!isCollapsed && (
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="overflow-hidden"
+            >
+              <h1 className="text-xl font-black text-gray-900 dark:text-white tracking-tighter leading-none whitespace-nowrap">WASLA ENTERPRISE</h1>
+              <span className="text-[10px] font-black text-[#00965e] uppercase tracking-widest mt-1 block">Swish KNOWLEDGE base</span>
+            </motion.div>
+          )}
         </div>
+        
+        {!isCollapsed && (
+          <button 
+            onClick={onClose}
+            className="lg:hidden p-2 text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
+          >
+            <X size={20} />
+          </button>
+        )}
+
+        {/* Desktop Toggle Button */}
         <button 
-          onClick={onClose}
-          className="lg:hidden p-2 text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
+          onClick={onToggleCollapse}
+          className="hidden lg:flex absolute -right-4 top-10 w-8 h-8 bg-white dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-700 items-center justify-center text-gray-400 hover:text-[#00965e] shadow-lg z-[90] transition-transform hover:scale-110"
         >
-          <X size={20} />
+          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 px-4 py-4 overflow-y-auto custom-scrollbar">
+      <div className={`flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar transition-all ${isCollapsed ? 'px-2' : 'px-4'} py-4`}>
         {/* Search Trigger */}
         <button
           onClick={onSearchOpen}
-          className="w-full flex items-center gap-3 py-3 px-4 rounded-2xl bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300 transition-all group mb-6 border border-gray-100 dark:border-gray-800"
+          title={isCollapsed ? "Search anything..." : undefined}
+          className={`w-full flex items-center gap-3 rounded-2xl bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300 transition-all group mb-6 border border-gray-100 dark:border-gray-800 ${
+            isCollapsed ? 'justify-center p-3' : 'py-3 px-4'
+          }`}
         >
-          <Search size={18} />
-          <span className="text-sm font-bold flex-1 text-left">Search anything...</span>
-          <span className="text-[10px] font-black bg-white dark:bg-gray-900 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 group-hover:border-gray-300 dark:group-hover:border-gray-600">CTRL K</span>
+          <Search size={18} className="flex-shrink-0" />
+          {!isCollapsed && (
+            <>
+              <span className="text-sm font-bold flex-1 text-left truncate">Search anything...</span>
+              <span className="text-[10px] font-black bg-white dark:bg-gray-900 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 group-hover:border-gray-300 dark:group-hover:border-gray-600">CTRL K</span>
+            </>
+          )}
+          {isCollapsed && (
+             <div className="absolute left-full ml-4 bg-gray-900 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-[100] font-black uppercase tracking-widest shadow-xl border border-white/10">
+                Search (CTRL+K)
+                <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-gray-900" />
+             </div>
+          )}
         </button>
 
         {/* Favorites Section */}
@@ -216,6 +275,7 @@ export default function Sidebar({
               icon={Star} 
               isOpen={openGroups.favorites} 
               onToggle={() => toggleGroup('favorites')}
+              isCollapsed={isCollapsed}
             >
               {pinnedViews.map(viewId => {
                 const item = ALL_NAV_ITEMS.find(i => i.id === viewId);
@@ -223,29 +283,39 @@ export default function Sidebar({
                 return navItem(item.label, () => (item as any).action(setCurrentView, setSelectedBrand, setSelectedAllergenBrand, setSelectedIngerinesBrand, setSelectedComplainBrand), currentView === item.view && (item.subBrand ? (selectedBrand === item.subBrand || selectedAllergenBrand === item.subBrand || selectedIngerinesBrand === item.subBrand || selectedComplainBrand === item.subBrand) : true), viewId);
               })}
             </NavGroup>
-            <div className="h-[1px] bg-gray-50 mx-4 my-2" />
+            {!isCollapsed && <div className="h-[1px] bg-gray-50 dark:bg-gray-800 mx-4 my-2" />}
           </div>
         )}
 
         {/* Dashboard / Home */}
-        <button
-          onClick={() => {
-            setCurrentView('branches');
-            setSelectedBrand(null);
-          }}
-          className={`w-full flex items-center justify-between py-2.5 px-4 rounded-xl transition-all group mb-2 ${
-            currentView === 'branches' && !selectedBrand ? 'bg-[#00965e]/10 text-[#00965e]' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300'
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <div className={`p-1.5 rounded-lg transition-colors ${
-              currentView === 'branches' && !selectedBrand ? 'bg-[#00965e] text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-700'
-            }`}>
-              <Database size={16} />
+        <div className="group relative">
+          <button
+            onClick={() => {
+              setCurrentView('branches');
+              setSelectedBrand(null);
+            }}
+            title={isCollapsed ? "General Dashboard" : undefined}
+            className={`w-full flex items-center transition-all group mb-2 ${
+              currentView === 'branches' && !selectedBrand ? 'bg-[#00965e]/10 text-[#00965e]' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300'
+            } ${isCollapsed ? 'justify-center p-3 rounded-2xl' : 'justify-between py-2.5 px-4 rounded-xl'}`}
+          >
+            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
+              <div className={`p-1.5 rounded-lg transition-colors ${
+                currentView === 'branches' && !selectedBrand ? 'bg-[#00965e] text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-700'
+              }`}>
+                <Database size={16} />
+              </div>
+              {!isCollapsed && <span className={`text-[13px] font-bold ${currentView === 'branches' && !selectedBrand ? 'text-[#00965e]' : ''} truncate`}>General Dashboard</span>}
             </div>
-            <span className={`text-[13px] font-bold ${currentView === 'branches' && !selectedBrand ? 'text-[#00965e]' : ''}`}>General Dashboard</span>
-          </div>
-        </button>
+          </button>
+          
+          {isCollapsed && (
+            <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-[100] font-black uppercase tracking-widest shadow-xl border border-white/10">
+              General Dashboard
+              <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-gray-900" />
+            </div>
+          )}
+        </div>
 
         {/* Brand Details */}
         <NavGroup 
@@ -253,6 +323,7 @@ export default function Sidebar({
           icon={Database} 
           isOpen={openGroups.brands} 
           onToggle={() => toggleGroup('brands')}
+          isCollapsed={isCollapsed}
         >
           {navItem('Shakir Branches', () => { setSelectedBrand('Shawarma Shakir'); setCurrentView('branches'); }, currentView === 'branches' && selectedBrand === 'Shawarma Shakir', 'brand-shakir')}
           {navItem('Yelo Branches', () => { setSelectedBrand('Yelo Pizza'); setCurrentView('branches'); }, currentView === 'branches' && selectedBrand === 'Yelo Pizza', 'brand-yelo')}
@@ -271,12 +342,11 @@ export default function Sidebar({
           icon={PlusCircle} 
           isOpen={openGroups.process} 
           onToggle={() => toggleGroup('process')}
+          isCollapsed={isCollapsed}
         >
           {navItem('New Order Process', () => setCurrentView('new-order'), currentView === 'new-order', 'proc-new')}
           {navItem('Follow Up Process', () => setCurrentView('follow-up'), currentView === 'follow-up', 'proc-follow')}
           {navItem('Complain Process', () => setCurrentView('complain'), currentView === 'complain', 'proc-complain')}
-          {navItem('Mishmash Complain', () => { setSelectedComplainBrand('Mishmash'); setCurrentView('complain'); }, currentView === 'complain' && selectedComplainBrand === 'Mishmash', 'proc-complain-mishmash')}
-          {navItem('Tabel Complain', () => { setSelectedComplainBrand('Tabel'); setCurrentView('complain'); }, currentView === 'complain' && selectedComplainBrand === 'Tabel', 'proc-complain-tabel')}
           {navItem('Complaint Status', () => setCurrentView('complaint-status'), currentView === 'complaint-status', 'proc-status')}
           {navItem('Additional', () => setCurrentView('additional'), currentView === 'additional', 'proc-additional')}
           {navItem('Special Requests', () => setCurrentView('special-requests'), currentView === 'special-requests', 'proc-special')}
@@ -288,6 +358,7 @@ export default function Sidebar({
           icon={Beef} 
           isOpen={openGroups.services} 
           onToggle={() => toggleGroup('services')}
+          isCollapsed={isCollapsed}
         >
           {navItem('Meat Sources', () => setCurrentView('meat-sources'), currentView === 'meat-sources', 'serv-meat')}
           {navItem('Talabat And Keeta', () => setCurrentView('talabat-keeta'), currentView === 'talabat-keeta', 'serv-talabat')}
@@ -300,6 +371,7 @@ export default function Sidebar({
           icon={Calendar} 
           isOpen={openGroups.catering} 
           onToggle={() => toggleGroup('catering')}
+          isCollapsed={isCollapsed}
         >
           {navItem('Package (Catering)', () => setCurrentView('catering-packages'), currentView === 'catering-packages', 'cat-pkg')}
           {navItem('Pre Order', () => setCurrentView('pre-order'), currentView === 'pre-order', 'pre-order')}
@@ -313,6 +385,7 @@ export default function Sidebar({
           icon={X} 
           isOpen={openGroups.cancellation} 
           onToggle={() => toggleGroup('cancellation')}
+          isCollapsed={isCollapsed}
         >
           {navItem('Steps', () => setCurrentView('cancellation'), currentView === 'cancellation', 'canc-steps')}
         </NavGroup>
@@ -323,6 +396,7 @@ export default function Sidebar({
           icon={Users} 
           isOpen={openGroups.contacts} 
           onToggle={() => toggleGroup('contacts')}
+          isCollapsed={isCollapsed}
         >
           {navItem('Shakir Contact', () => setCurrentView('shakir-contact'), currentView === 'shakir-contact', 'cont-shakir')}
           {navItem('Yelo Contact', () => setCurrentView('yelo-contact'), currentView === 'yelo-contact', 'cont-yelo')}
@@ -339,6 +413,7 @@ export default function Sidebar({
           icon={Warning} 
           isOpen={openGroups.allergens} 
           onToggle={() => toggleGroup('allergens')}
+          isCollapsed={isCollapsed}
         >
           {navItem('Yelo Allergens', () => { setSelectedAllergenBrand('yelo'); setCurrentView('allergens'); }, currentView === 'allergens' && selectedAllergenBrand === 'yelo', 'all-yelo')}
           {navItem('Slice Allergens', () => { setSelectedAllergenBrand('slice'); setCurrentView('allergens'); }, currentView === 'allergens' && selectedAllergenBrand === 'slice', 'all-slice')}
@@ -355,6 +430,7 @@ export default function Sidebar({
           icon={Beaker} 
           isOpen={openGroups.ingredients} 
           onToggle={() => toggleGroup('ingredients')}
+          isCollapsed={isCollapsed}
         >
           {navItem('Shakir Ingredients', () => { setSelectedIngerinesBrand('shakir'); setCurrentView('ingerines'); }, currentView === 'ingerines' && selectedIngerinesBrand === 'shakir', 'ing-shakir')}
           {navItem('Just Ingredients', () => { setSelectedIngerinesBrand('just'); setCurrentView('ingerines'); }, currentView === 'ingerines' && selectedIngerinesBrand === 'just', 'ing-just')}
@@ -363,27 +439,39 @@ export default function Sidebar({
         </NavGroup>
 
         {/* Task Management */}
-        <button
-          onClick={() => setCurrentView('task')}
-          className={`w-full flex items-center justify-between py-2.5 px-4 rounded-xl transition-all group mt-2 ${
-            currentView === 'task' ? 'bg-[#00965e]/10 text-[#00965e]' : 'text-gray-500 hover:bg-gray-50'
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <div className={`p-1.5 rounded-lg transition-colors ${
-              currentView === 'task' ? 'bg-[#00965e] text-white' : 'bg-gray-50 text-gray-400 group-hover:bg-gray-100'
-            }`}>
-              <FileText size={16} />
+        <div className="group relative">
+          <button
+            onClick={() => setCurrentView('task')}
+            title={isCollapsed ? "Task Management" : undefined}
+            className={`w-full flex items-center transition-all group mt-2 ${
+              currentView === 'task' ? 'bg-[#00965e]/10 text-[#00965e]' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
+            } ${isCollapsed ? 'justify-center p-3 rounded-2xl' : 'justify-between py-2.5 px-4 rounded-xl'}`}
+          >
+            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
+              <div className={`p-1.5 rounded-lg transition-colors ${
+                currentView === 'task' ? 'bg-[#00965e] text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-700'
+              }`}>
+                <FileText size={16} />
+              </div>
+              {!isCollapsed && <span className={`text-[13px] font-bold ${currentView === 'task' ? 'text-[#00965e]' : ''} truncate`}>Task Management</span>}
             </div>
-            <span className={`text-[13px] font-bold ${currentView === 'task' ? 'text-[#00965e]' : ''}`}>Task Management</span>
-          </div>
-        </button>
+          </button>
+          
+          {isCollapsed && (
+            <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-[100] font-black uppercase tracking-widest shadow-xl border border-white/10">
+              Task Management
+              <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-gray-900" />
+            </div>
+          )}
+        </div>
 
         {(isAdmin || user?.role === 'leader' || user?.role === 'manager') && (
-          <div className="py-4 border-t border-gray-50 mt-4">
-            <h3 className="px-4 mb-2 text-[10px] font-black text-purple-400 uppercase tracking-[0.2em]">
-              {isAdmin ? 'Admin' : user?.role === 'leader' ? 'Leader' : 'Management'}
-            </h3>
+          <div className={`py-4 border-t border-gray-50 dark:border-gray-800 mt-4 transition-all ${isCollapsed ? 'px-0' : ''}`}>
+            {!isCollapsed && (
+              <h3 className="px-4 mb-2 text-[10px] font-black text-purple-400 uppercase tracking-[0.2em] truncate">
+                {isAdmin ? 'Admin' : user?.role === 'leader' ? 'Leader' : 'Management'}
+              </h3>
+            )}
             <div className="space-y-1">
               {[
                 ...(user?.role === 'admin' ? [
@@ -395,22 +483,31 @@ export default function Sidebar({
                   { id: 'reports' as any, label: 'Analytics', icon: BarChart },
                 ] : []),
               ].map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => setCurrentView(item.id as ViewType)}
-                  className={`w-full flex items-center justify-between py-2 px-4 rounded-xl transition-all group ${
-                    currentView === item.id ? 'bg-purple-50 text-purple-600' : 'text-gray-500 hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-1.5 rounded-lg transition-colors ${
-                      currentView === item.id ? 'bg-purple-500 text-white' : 'bg-gray-50 text-gray-400 group-hover:bg-gray-100'
-                    }`}>
-                      <item.icon size={16} />
+                <div key={item.id} className="group/admin relative">
+                  <button
+                    onClick={() => setCurrentView(item.id as ViewType)}
+                    title={isCollapsed ? item.label : undefined}
+                    className={`w-full flex items-center transition-all group ${
+                      currentView === item.id ? 'bg-purple-50 dark:bg-purple-900/10 text-purple-600 dark:text-purple-400' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    } ${isCollapsed ? 'justify-center p-3 rounded-2xl' : 'justify-between py-2 px-4 rounded-xl'}`}
+                  >
+                    <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
+                      <div className={`p-1.5 rounded-lg transition-colors ${
+                        currentView === item.id ? 'bg-purple-500 text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-700'
+                      }`}>
+                        <item.icon size={16} />
+                      </div>
+                      {!isCollapsed && <span className={`text-[13px] font-bold truncate`}>{item.label}</span>}
                     </div>
-                    <span className={`text-[13px] font-bold`}>{item.label}</span>
-                  </div>
-                </button>
+                  </button>
+                  
+                  {isCollapsed && (
+                    <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 pointer-events-none group-hover/admin:opacity-100 transition-opacity whitespace-nowrap z-[100] font-black uppercase tracking-widest shadow-xl border border-white/10">
+                      {item.label}
+                      <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-gray-900" />
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
@@ -418,57 +515,97 @@ export default function Sidebar({
       </div>
 
       {/* Bottom Actions */}
-      <div className="p-6 mt-auto space-y-2 border-t border-gray-50 dark:border-gray-800 bg-white dark:bg-gray-900">
+      <div className={`mt-auto space-y-2 border-t border-gray-50 dark:border-gray-800 bg-white dark:bg-gray-900 transition-all ${isCollapsed ? 'p-2' : 'p-6'}`}>
         {/* Dark Mode Toggle */}
-        <button 
-          type="button"
-          onClick={onToggleDarkMode}
-          className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-all duration-200 group text-left outline-none border-none ring-offset-white dark:ring-offset-gray-900 focus-visible:ring-2 focus-visible:ring-blue-500"
-          aria-label={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-        >
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-all duration-500 ${
-            isDarkMode 
-              ? 'bg-blue-500/20 text-blue-400' 
-              : 'bg-yellow-400/20 text-yellow-600'
-          }`}>
-            {isDarkMode ? <Moon size={20} fill="currentColor" /> : <Sun size={20} />}
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-black text-gray-900 dark:text-white leading-tight">
-              {isDarkMode ? 'Dark Mode' : 'Light Mode'}
-            </span>
-            <span className="text-[10px] font-bold text-gray-400 dark:text-gray-400 uppercase tracking-widest mt-0.5">
-              {isDarkMode ? 'Switch to light' : 'Switch to dark'}
-            </span>
-          </div>
-        </button>
-
-        <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group">
-          <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 group-hover:bg-[#00965e]/10 group-hover:text-[#00965e] transition-colors">
-            <Globe size={18} />
-          </div>
-          <span className="text-sm font-bold text-gray-600 dark:text-gray-400">العربية</span>
+        <div className="group relative">
+          <button 
+            type="button"
+            onClick={onToggleDarkMode}
+            title={isCollapsed ? "Toggle Dark/Light" : undefined}
+            className={`w-full flex items-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-all duration-200 group text-left outline-none border-none ring-offset-white dark:ring-offset-gray-900 focus-visible:ring-2 focus-visible:ring-blue-500 ${
+              isCollapsed ? 'justify-center p-2' : 'gap-4 p-3'
+            }`}
+          >
+            <div className={`shrink-0 rounded-full flex items-center justify-center shadow-sm transition-all duration-500 ${isCollapsed ? 'w-10 h-10' : 'w-10 h-10'} ${
+              isDarkMode 
+                ? 'bg-blue-500/20 text-blue-400' 
+                : 'bg-yellow-400/20 text-yellow-600'
+            }`}>
+              {isDarkMode ? <Moon size={20} fill="currentColor" /> : <Sun size={20} />}
+            </div>
+            {!isCollapsed && (
+              <div className="flex flex-col overflow-hidden">
+                <span className="text-sm font-black text-gray-900 dark:text-white leading-tight truncate">
+                  {isDarkMode ? 'Dark Mode' : 'Light Mode'}
+                </span>
+                <span className="text-[10px] font-bold text-gray-400 dark:text-gray-400 uppercase tracking-widest mt-0.5 truncate">
+                  {isDarkMode ? 'Switch to light' : 'Switch to dark'}
+                </span>
+              </div>
+            )}
+          </button>
+          
+          {isCollapsed && (
+            <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-[100] font-black uppercase tracking-widest shadow-xl border border-white/10">
+              {isDarkMode ? 'Switch to Light' : 'Switch to Dark'}
+              <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-gray-900" />
+            </div>
+          )}
         </div>
 
-        <button 
-          onClick={onLogout}
-          className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors group text-left"
-        >
-          <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center group-hover:bg-red-100 dark:group-hover:bg-red-900/40 transition-colors">
-            <LogOut size={18} />
+        <div className="group relative">
+          <div className={`flex items-center rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group ${isCollapsed ? 'justify-center p-2' : 'gap-4 p-3'}`}>
+            <div className={`shrink-0 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 group-hover:bg-[#00965e]/10 group-hover:text-[#00965e] transition-colors ${isCollapsed ? 'w-10 h-10' : 'w-10 h-10'}`}>
+              <Globe size={18} />
+            </div>
+            {!isCollapsed && <span className="text-sm font-bold text-gray-600 dark:text-gray-400 flex-1 truncate">العربية</span>}
           </div>
-          <span className="text-sm font-bold">Logout</span>
-        </button>
+          
+          {isCollapsed && (
+            <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-[100] font-black uppercase tracking-widest shadow-xl border border-white/10">
+              العربية (Arabic)
+              <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-gray-900" />
+            </div>
+          )}
+        </div>
+
+        <div className="group relative">
+          <button 
+            onClick={onLogout}
+            title={isCollapsed ? "Logout" : undefined}
+            className={`w-full flex items-center rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors group text-left ${isCollapsed ? 'justify-center p-2' : 'gap-4 p-3'}`}
+          >
+            <div className={`shrink-0 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center group-hover:bg-red-100 dark:group-hover:bg-red-900/40 transition-colors ${isCollapsed ? 'w-10 h-10' : 'w-10 h-10'}`}>
+              <LogOut size={18} />
+            </div>
+            {!isCollapsed && <span className="text-sm font-bold truncate">Logout</span>}
+          </button>
+          
+          {isCollapsed && (
+            <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-[100] font-black uppercase tracking-widest shadow-xl border border-white/10">
+              Logout
+              <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-gray-900" />
+            </div>
+          )}
+        </div>
 
         {/* User Profile */}
-        <div className="mt-8 pt-6 border-t border-gray-50 dark:border-gray-800 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-900 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-white font-bold">
+        <div className={`mt-8 border-t border-gray-50 dark:border-gray-800 flex items-center transition-all ${isCollapsed ? 'p-2 justify-center pt-4' : 'px-3 pt-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-2xl group cursor-pointer'}`}>
+          <div className={`shrink-0 transition-all ${isCollapsed ? 'w-10 h-10' : 'w-10 h-10'} rounded-full bg-gray-900 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-white font-bold relative group/avatar`}>
             {user?.name?.[0] || 'U'}
+            {isCollapsed && (
+              <div className="absolute left-full ml-4 bottom-0 bg-gray-900 text-white text-[10px] py-1.5 px-3 rounded-lg opacity-0 pointer-events-none group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap z-[100] font-black uppercase tracking-widest shadow-xl border border-white/10">
+                {user?.name} ({user?.role})
+                <div className="absolute right-full bottom-3 border-8 border-transparent border-r-gray-900" />
+              </div>
+            )}
           </div>
-          <div className="overflow-hidden">
-            <p className="text-sm font-black text-gray-900 dark:text-white truncate tracking-tight">{user?.name}</p>
-            <p className="text-[10px] font-bold text-gray-400 dark:text-gray-400 uppercase">{user?.role}</p>
-          </div>
+          {!isCollapsed && (
+            <div className="overflow-hidden ml-3">
+              <p className="text-sm font-black text-gray-900 dark:text-white truncate tracking-tight">{user?.name}</p>
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-400 uppercase truncate">{user?.role}</p>
+            </div>
+          )}
         </div>
       </div>
     </aside>
@@ -488,8 +625,6 @@ const ALL_NAV_ITEMS = [
   { id: 'proc-new', label: 'New Order Process', view: 'new-order', action: (sV: any) => sV('new-order') },
   { id: 'proc-follow', label: 'Follow Up Process', view: 'follow-up', action: (sV: any) => sV('follow-up') },
   { id: 'proc-complain', label: 'Complain Process', view: 'complain', action: (sV: any, sB: any, sA: any, sI: any, sCB: any) => { sCB(null); sV('complain'); } },
-  { id: 'proc-complain-mishmash', label: 'Mishmash Complain', view: 'complain', action: (sV: any, sB: any, sA: any, sI: any, sCB: any) => { sCB('Mishmash'); sV('complain'); } },
-  { id: 'proc-complain-tabel', label: 'Tabel Complain', view: 'complain', action: (sV: any, sB: any, sA: any, sI: any, sCB: any) => { sCB('Tabel'); sV('complain'); } },
   { id: 'proc-status', label: 'Complaint Status', view: 'complaint-status', action: (sV: any) => sV('complaint-status') },
   { id: 'proc-additional', label: 'Additional Process', view: 'additional', action: (sV: any) => sV('additional') },
   { id: 'proc-special', label: 'Special Requests', view: 'special-requests', action: (sV: any) => sV('special-requests') },
