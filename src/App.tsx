@@ -699,6 +699,7 @@ export default function App() {
   const [isIngerinesDropdownOpen, setIsIngerinesDropdownOpen] = useState(false);
   const [selectedIngerinesBrand, setSelectedIngerinesBrand] = useState<string>('shakir');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   const [pinnedViews, setPinnedViews] = useState<string[]>(() => {
     const saved = localStorage.getItem('pinnedViews');
@@ -1510,6 +1511,8 @@ export default function App() {
             <Sidebar 
               isOpen={isSidebarOpen}
               onClose={() => setIsSidebarOpen(false)}
+              isCollapsed={isSidebarCollapsed}
+              onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
               currentView={currentView} 
               setCurrentView={(view) => {
                 setCurrentView(view);
