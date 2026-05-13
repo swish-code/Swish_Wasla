@@ -30,7 +30,7 @@ export interface BranchColumn {
   createdAt: string;
 }
 
-export type Brand = 'Shawarma Shakir' | 'Yelo Pizza' | 'BBT' | 'Slice' | 'Pattie Pattie' | 'Just C' | 'Chili pepper';
+export type Brand = 'Shawarma Shakir' | 'Yelo Pizza' | 'BBT' | 'Slice' | 'Pattie Pattie' | 'Just C' | 'Chili pepper' | 'Tabel' | 'Mishmash';
 
 export type UserRole = 'admin' | 'leader' | 'manager' | 'employee';
 
@@ -47,12 +47,18 @@ export interface AuthState {
   isLoading: boolean;
 }
 
-export type ViewType = 'branches' | 'new-order' | 'follow-up' | 'complain' | 'complaint-status' | 'additional' | 'special-requests' | 'meat-sources' | 'talabat-keeta' | 'kuwaiti-terms' | 'catering-packages' | 'pre-order' | 'pre-order-pro' | 'remote-areas' | 'cancellation' | 'shakir-contact' | 'yelo-contact' | 'bbt-contact' | 'mishmash-contact' | 'tabel-contact' | 'users-contact' | 'extension-contact' | 'employee-ex-contact' | 'allergens' | 'ingerines' | 'task' | 'login' | 'user-mgmt' | 'reports' | 'audit-logs' | 'custom-cards';
+export type ViewType = 'branches' | 'new-order' | 'follow-up' | 'complain' | 'complaint-status' | 'additional' | 'special-requests' | 'meat-sources' | 'talabat-keeta' | 'kuwaiti-terms' | 'catering-packages' | 'pre-order' | 'pre-order-pro' | 'remote-areas' | 'cancellation' | 'shakir-contact' | 'yelo-contact' | 'bbt-contact' | 'mishmash-contact' | 'tabel-contact' | 'users-contact' | 'extension-contact' | 'employee-ex-contact' | 'allergens' | 'ingerines' | 'task' | 'login' | 'user-mgmt' | 'reports' | 'audit-logs' | 'custom-cards' | 'offers';
+
+export interface Point {
+  text: string;
+  icon?: string;
+}
 
 export interface CustomCard {
   id: number;
   title: string;
   content: string;
+  points?: Point[]; // New field for structured list
   page: string;
   color: string;
   isVisible: boolean;
@@ -82,4 +88,17 @@ export interface ProcessContent {
   title: string;
   icon: string;
   script: string[];
+}
+
+export interface Offer {
+  id: number;
+  brand: string;
+  title: string;
+  description: string;
+  price: string;
+  imageUrl: string | null;
+  aggregators: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  createdAt: string;
 }
