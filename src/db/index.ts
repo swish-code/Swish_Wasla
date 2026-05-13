@@ -181,6 +181,29 @@ export const setupDb = async () => {
         is_read BOOLEAN DEFAULT false NOT NULL,
         UNIQUE(user_id, notification_id)
       );
+
+      CREATE TABLE IF NOT EXISTS offers (
+        id SERIAL PRIMARY KEY,
+        brand TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        price TEXT NOT NULL,
+        image_url TEXT,
+        aggregators TEXT,
+        start_date TIMESTAMP,
+        end_date TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL
+      );
+
+      DO $$ 
+      BEGIN 
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='offers' AND column_name='image_url') THEN
+          ALTER TABLE offers ADD COLUMN image_url TEXT;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='offers' AND column_name='aggregators') THEN
+          ALTER TABLE offers ADD COLUMN aggregators TEXT;
+        END IF;
+      END $$;
     `);
 
     // Seed default admin ONLY if no users exist
