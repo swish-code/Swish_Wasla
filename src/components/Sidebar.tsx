@@ -87,7 +87,7 @@ const NavGroup = ({ label, icon: Icon, isOpen, onToggle, children, isCollapsed }
           <div className="p-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-700 transition-colors">
             <Icon size={16} />
           </div>
-          {!isCollapsed && <span className="text-[13px] font-bold text-gray-700 dark:text-gray-300 truncate">{label}</span>}
+          {!isCollapsed && <span className="text-[14px] font-bold text-gray-700 dark:text-gray-300 truncate">{label}</span>}
         </div>
         {!isCollapsed && (
           <motion.div
@@ -153,7 +153,7 @@ export default function Sidebar({
   const navItem = (label: string, onClick: () => void, isActive: boolean, viewId?: string) => (
     <div key={viewId || label} className="group/item relative">
       <div
-        className={`w-full flex items-center justify-between py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+        className={`w-full flex items-center justify-between py-2.5 px-3 rounded-xl text-[13px] font-bold transition-all ${
           isActive 
             ? 'bg-[#00965e]/10 text-[#00965e]' 
             : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white group-hover/item:text-gray-900 dark:group-hover/item:text-white'
@@ -218,8 +218,8 @@ export default function Sidebar({
               animate={{ opacity: 1, x: 0 }}
               className="overflow-hidden"
             >
-              <h1 className="text-xl font-black text-gray-900 dark:text-white tracking-tighter leading-none whitespace-nowrap">WASLA ENTERPRISE</h1>
-              <span className="text-[10px] font-black text-[#00965e] uppercase tracking-widest mt-1 block">Swish KNOWLEDGE base</span>
+              <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tighter leading-none whitespace-nowrap">WASLA ENTERPRISE</h1>
+              <span className="text-[11px] font-black text-[#00965e] uppercase tracking-widest mt-1 block">Swish KNOWLEDGE base</span>
             </motion.div>
           )}
         </div>
@@ -346,6 +346,7 @@ export default function Sidebar({
         >
           {navItem('New Order Process', () => setCurrentView('new-order'), currentView === 'new-order', 'proc-new')}
           {navItem('Follow Up Process', () => setCurrentView('follow-up'), currentView === 'follow-up', 'proc-follow')}
+          {navItem('Offer', () => setCurrentView('offers'), currentView === 'offers', 'proc-offer')}
           {navItem('Complain Process', () => setCurrentView('complain'), currentView === 'complain', 'proc-complain')}
           {navItem('Complaint Status', () => setCurrentView('complaint-status'), currentView === 'complaint-status', 'proc-status')}
           {navItem('Additional', () => setCurrentView('additional'), currentView === 'additional', 'proc-additional')}
@@ -624,6 +625,7 @@ const ALL_NAV_ITEMS = [
   { id: 'brand-mishmash', label: 'Mishmash Branches', view: 'branches', subBrand: 'Mishmash', action: (sV: any, sB: any, sA: any, sI: any) => { sB('Mishmash'); sV('branches'); } },
   { id: 'proc-new', label: 'New Order Process', view: 'new-order', action: (sV: any) => sV('new-order') },
   { id: 'proc-follow', label: 'Follow Up Process', view: 'follow-up', action: (sV: any) => sV('follow-up') },
+  { id: 'proc-offer', label: 'Offers', view: 'offers', action: (sV: any) => sV('offers') },
   { id: 'proc-complain', label: 'Complain Process', view: 'complain', action: (sV: any, sB: any, sA: any, sI: any, sCB: any) => { sCB(null); sV('complain'); } },
   { id: 'proc-status', label: 'Complaint Status', view: 'complaint-status', action: (sV: any) => sV('complaint-status') },
   { id: 'proc-additional', label: 'Additional Process', view: 'additional', action: (sV: any) => sV('additional') },
