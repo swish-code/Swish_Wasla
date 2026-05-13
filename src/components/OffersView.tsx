@@ -362,7 +362,7 @@ export default function OffersView({ user }: OffersViewProps) {
                     <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tighter uppercase">
                       {editingOffer ? 'Edit Offer Details' : 'Create New Offer'}
                     </h2>
-                    <p className="text-gray-400 font-bold italic">Fill in the promotion parameters below</p>
+                    <p className="text-gray-400 font-bold italic">Fill in the promotion parameters beloww</p>
                   </div>
                   <button 
                     onClick={() => setIsModalOpen(false)}
