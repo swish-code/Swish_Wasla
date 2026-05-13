@@ -9,6 +9,7 @@ import TaskModal from './components/TaskModal';
 import NotificationCenter from './components/NotificationCenter';
 import { CustomCard, CustomCardManager } from './components/CustomCards';
 import { CustomCard as CustomCardType } from './types';
+import OffersView from './components/OffersView';
 
 const GlobalSearch = ({ 
   isOpen, 
@@ -1766,6 +1767,16 @@ export default function App() {
                 </motion.div>
               </div>
             </motion.div>
+          ) : currentView === 'offers' ? (
+            <motion.div
+              key="offers"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <OffersView user={auth.user} />
+            </motion.div>
           ) : currentView === 'branches' ? (
             <motion.div
               key="branches"
@@ -1778,8 +1789,8 @@ export default function App() {
               {/* Top Bar for Dashboard View */}
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8 lg:mb-12">
                 <div>
-                  <h1 className="text-3xl lg:text-4xl font-black text-gray-900 dark:text-white tracking-tighter">Knowledge Base</h1>
-                  <p className="text-gray-500 dark:text-gray-400 font-medium text-sm lg:text-base">Manage and track all restaurant branch information</p>
+                  <h1 className="text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tighter">Knowledge Base</h1>
+                  <p className="text-gray-500 dark:text-gray-400 font-bold text-base lg:text-lg italic">Manage and track all restaurant branch information</p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
@@ -1889,27 +1900,27 @@ export default function App() {
                     <table className="w-full text-center border-collapse">
                       <thead>
                         <tr className="bg-gray-50/50 dark:bg-gray-800/50 text-gray-400 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
-                          <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Brand</th>
-                          <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[150px]">Branch Name</th>
-                          <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[250px]">Address</th>
+                          <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Brand</th>
+                          <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[150px]">Branch Name</th>
+                          <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[250px]">Address</th>
                           {canEdit && (
-                              <th className="px-2 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Order</th>
+                              <th className="px-2 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Order</th>
                           )}
-                          <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Delivery</th>
-                          <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Pickup</th>
-                          <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Dine In</th>
-                          <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[150px]">Hours</th>
-                          <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[130px]">Last Delivery</th>
-                          <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[130px]">Last Pickup</th>
-                          <th className="px-4 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">TGO</th>
-                          <th className="px-4 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">TMP</th>
-                          <th className="px-4 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Deliveroo</th>
-                          <th className="px-4 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">V-Thru</th>
-                          <th className="px-4 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Cari</th>
-                          <th className="px-4 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Jahez</th>
-                          <th className="px-4 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Keeta</th>
+                          <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[120px]">Delivery</th>
+                          <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[120px]">Pickup</th>
+                          <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[140px]">Dine In</th>
+                          <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[150px]">Hours</th>
+                          <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[130px]">Last Delivery</th>
+                          <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[130px]">Last Pickup</th>
+                          <th className="px-4 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">TGO</th>
+                          <th className="px-4 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">TMP</th>
+                          <th className="px-4 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Deliveroo</th>
+                          <th className="px-4 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">V-Thru</th>
+                          <th className="px-4 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Cari</th>
+                          <th className="px-4 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Jahez</th>
+                          <th className="px-4 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Keeta</th>
                           {dynamicColumns.map(col => (
-                            <th key={col.id} className="px-4 py-5 text-[10px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 bg-blue-50/30 dark:bg-blue-900/10 dark:text-blue-300">
+                            <th key={col.id} className="px-4 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 bg-blue-50/30 dark:bg-blue-900/10 dark:text-blue-300">
                               {col.label}
                               {isAdmin && (
                                 <button 
@@ -1937,8 +1948,8 @@ export default function App() {
                           filteredData.map((branch, index) => (
                             <tr key={branch.id} className={`group hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0`}>
                               <td className="px-6 py-6 font-bold text-gray-400 dark:text-gray-400 border-r border-gray-50/50 dark:border-gray-800">{branch.brand}</td>
-                              <td className="px-6 py-6 font-black text-gray-900 dark:text-white border-r border-gray-50/50 dark:border-gray-800">{branch.branchName}</td>
-                              <td className="px-6 py-6 text-left text-[11px] font-bold text-gray-500 dark:text-gray-400 border-r border-gray-50/50 dark:border-gray-800 max-w-xs">{branch.address}</td>
+                              <td className="px-6 py-6 font-black text-gray-900 dark:text-white border-r border-gray-50/50 dark:border-gray-800 text-[16px]">{branch.branchName}</td>
+                              <td className="px-6 py-6 text-left text-[13px] font-bold text-gray-500 dark:text-gray-400 border-r border-gray-50/50 dark:border-gray-800 max-w-xs">{branch.address}</td>
                               {canEdit && (
                                 <td className="px-2 py-4 border-r border-gray-50/50 dark:border-gray-800">
                                   <div className="flex flex-col items-center gap-1">
@@ -1959,24 +1970,36 @@ export default function App() {
                                   </div>
                                 </td>
                               )}
-                              <td className={`px-6 py-6 border-r border-gray-50/50 dark:border-gray-800`}>
-                                <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${getStatusColor(branch.delivery)} shadow-sm`}>
-                                  {branch.delivery}
-                                </span>
+                              <td className={`px-4 py-6 border-r border-gray-50/50 dark:border-gray-800`}>
+                                <div className="flex justify-center">
+                                  <span className={`px-4 py-2 rounded-xl text-[12px] font-black shadow-sm ${
+                                    (branch.delivery?.length || 0) > 3 ? 'normal-case tracking-normal min-w-[60px] text-center' : 'uppercase tracking-widest'
+                                  } ${getStatusColor(branch.delivery)}`}>
+                                    {branch.delivery}
+                                  </span>
+                                </div>
                               </td>
-                              <td className={`px-6 py-6 border-r border-gray-50/50 dark:border-gray-800`}>
-                                <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${getStatusColor(branch.pickup)} shadow-sm`}>
-                                  {branch.pickup}
-                                </span>
+                              <td className={`px-4 py-6 border-r border-gray-50/50 dark:border-gray-800`}>
+                                <div className="flex justify-center">
+                                  <span className={`px-4 py-2 rounded-xl text-[12px] font-black shadow-sm ${
+                                    (branch.pickup?.length || 0) > 3 ? 'normal-case tracking-normal min-w-[60px] text-center' : 'uppercase tracking-widest'
+                                  } ${getStatusColor(branch.pickup)}`}>
+                                    {branch.pickup}
+                                  </span>
+                                </div>
                               </td>
-                              <td className={`px-6 py-6 border-r border-gray-50/50 dark:border-gray-800`}>
-                                <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${getStatusColor(branch.dineIn)} shadow-sm`}>
-                                  {branch.dineIn}
-                                </span>
+                              <td className={`px-4 py-6 border-r border-gray-50/50 dark:border-gray-800`}>
+                                <div className="flex justify-center">
+                                  <span className={`px-4 py-2 rounded-xl text-[12px] font-black shadow-sm ${
+                                    (branch.dineIn?.length || 0) > 3 ? 'normal-case tracking-normal min-w-[60px] text-center' : 'uppercase tracking-widest'
+                                  } ${getStatusColor(branch.dineIn)}`}>
+                                    {branch.dineIn}
+                                  </span>
+                                </div>
                               </td>
-                              <td className="px-6 py-6 font-bold text-gray-700 dark:text-gray-300 text-[11px] border-r border-gray-50/50 dark:border-gray-800">{branch.workingHours}</td>
-                              <td className="px-6 py-6 font-bold text-blue-600 dark:text-blue-400 text-[11px] border-r border-gray-50/50 dark:border-gray-800 bg-blue-50/20 dark:bg-blue-900/10">{branch.lastOrderDelivery || '-'}</td>
-                              <td className="px-6 py-6 font-bold text-green-600 dark:text-green-400 text-[11px] border-r border-gray-50/50 dark:border-gray-800 bg-green-50/20 dark:bg-green-900/10">{branch.lastOrderPickup || '-'}</td>
+                              <td className="px-6 py-6 font-bold text-gray-700 dark:text-gray-300 text-[13px] border-r border-gray-50/50 dark:border-gray-800">{branch.workingHours}</td>
+                              <td className="px-6 py-6 font-bold text-blue-600 dark:text-blue-400 text-[13px] border-r border-gray-50/50 dark:border-gray-800 bg-blue-50/20 dark:bg-blue-900/10">{branch.lastOrderDelivery || '-'}</td>
+                              <td className="px-6 py-6 font-bold text-green-600 dark:text-green-400 text-[13px] border-r border-gray-50/50 dark:border-gray-800 bg-green-50/20 dark:bg-green-900/10">{branch.lastOrderPickup || '-'}</td>
                               
                               <td className={`px-4 py-6 border-r border-gray-50/50 dark:border-gray-800`}>
                                 <div className={`w-8 h-8 mx-auto rounded-lg flex items-center justify-center ${getStatusColor(branch.tgo)} shadow-sm`}>
@@ -2018,7 +2041,7 @@ export default function App() {
                                 const val = customData[col.name] || 'No';
                                 return (
                                   <td key={col.id} className={`px-4 py-6 border-r border-gray-50/50 dark:border-gray-800 bg-blue-50/10 dark:bg-blue-900/5`}>
-                                    <div className={`w-8 h-8 mx-auto rounded-lg flex items-center justify-center ${getStatusColor(val)} shadow-sm font-black text-[10px]`}>
+                                    <div className={`w-8 h-8 mx-auto rounded-lg flex items-center justify-center ${getStatusColor(val)} shadow-sm font-black text-[12px]`}>
                                       {val.toLowerCase() === 'yes' ? 'Y' : val.toLowerCase() === 'no' ? 'N' : '?' }
                                     </div>
                                   </td>
@@ -2172,7 +2195,7 @@ export default function App() {
                       </h2>
                     </div>
 
-                    <div className="space-y-8 text-right leading-[1.8] text-gray-600 dark:text-gray-400 font-medium text-lg max-w-3xl mx-auto" dir="rtl">
+                    <div className="space-y-8 text-right leading-[1.8] text-gray-600 dark:text-gray-400 font-bold text-xl max-w-3xl mx-auto" dir="rtl">
                       {PROCESS_SCRIPTS.newOrder[selectedProcessSubtype].script.map((line, idx) => (
                         <div key={idx} className="pb-6 border-b border-gray-50 dark:border-gray-800 last:border-b-0 group/line">
                           <div className="bg-gray-50/0 dark:bg-gray-800/0 group-hover/line:bg-gray-50/50 dark:group-hover/line:bg-gray-800/50 rounded-2xl p-4 -mx-4 transition-colors">
@@ -2207,7 +2230,7 @@ export default function App() {
                          />
                        </h3>
                     </div>
-                    <div className="max-w-3xl w-full text-blue-100/80 text-center leading-[2] text-[15px] font-medium space-y-6" dir="rtl">
+                    <div className="max-w-3xl w-full text-blue-100/80 text-center leading-[2] text-[17px] font-bold space-y-6" dir="rtl">
                       <div className="bg-white/5 rounded-3xl p-8 border border-white/5">
                         <EditableText 
                           contentKey="process_newOrder_notes_text"
@@ -2283,7 +2306,7 @@ export default function App() {
                       </h2>
                     </div>
 
-                    <div className="space-y-8 text-right leading-[1.8] text-gray-600 dark:text-gray-400 font-medium text-lg max-w-3xl mx-auto" dir="rtl">
+                    <div className="space-y-8 text-right leading-[1.8] text-gray-600 dark:text-gray-400 font-bold text-xl max-w-3xl mx-auto" dir="rtl">
                       {(PROCESS_SCRIPTS.followUp[selectedFollowUpSubtype as keyof typeof PROCESS_SCRIPTS.followUp] as any).script.map((line: string, idx: number) => (
                         <div key={idx} className="pb-6 border-b border-gray-50 dark:border-gray-800 last:border-b-0 group/line">
                           <div className="bg-gray-50/0 dark:bg-gray-800/0 group-hover/line:bg-gray-50/50 dark:group-hover/line:bg-gray-800/50 rounded-2xl p-4 -mx-4 transition-colors">
@@ -2321,7 +2344,7 @@ export default function App() {
                          />
                        </h3>
                     </div>
-                    <div className="max-w-3xl w-full text-blue-100/80 text-center leading-[2] text-[15px] font-medium space-y-6" dir="rtl">
+                    <div className="max-w-3xl w-full text-blue-100/80 text-center leading-[2] text-[17px] font-bold space-y-6" dir="rtl">
                       {PROCESS_SCRIPTS.followUp.notes.items.map((item, idx) => (
                         <div key={idx} className="bg-white/5 rounded-2xl p-6 border border-white/5 hover:bg-white/[0.07] transition-all group/note">
                           <div className="flex items-start gap-4">
@@ -2406,7 +2429,7 @@ export default function App() {
                           </div>
                           <h3 className="text-xl font-black text-gray-900 dark:text-white">Call Center</h3>
                         </div>
-                        <div className="text-gray-600 dark:text-gray-400 text-[15px] leading-relaxed font-medium">
+                        <div className="text-gray-600 dark:text-gray-400 text-[17px] leading-relaxed font-bold">
                           <EditableText 
                             contentKey={`process_complain_${selectedComplainBrand || 'general'}_${selectedComplainType}_call`}
                             defaultValue={t(`process_complain_${selectedComplainBrand || 'general'}_${selectedComplainType}_call`, (selectedComplainBrand && (PROCESS_SCRIPTS as any).brandComplaints?.[selectedComplainBrand] 
@@ -2430,7 +2453,7 @@ export default function App() {
                           </div>
                           <h3 className="text-xl font-black text-gray-900 dark:text-white">Aggregators</h3>
                         </div>
-                        <div className="text-gray-600 dark:text-gray-400 text-[15px] leading-relaxed font-medium">
+                        <div className="text-gray-600 dark:text-gray-400 text-[17px] leading-relaxed font-bold">
                           <EditableText 
                             contentKey={`process_complain_${selectedComplainBrand || 'general'}_${selectedComplainType}_platform`}
                             defaultValue={t(`process_complain_${selectedComplainBrand || 'general'}_${selectedComplainType}_platform`, (selectedComplainBrand && (PROCESS_SCRIPTS as any).brandComplaints?.[selectedComplainBrand] 
