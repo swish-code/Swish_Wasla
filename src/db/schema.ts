@@ -85,6 +85,7 @@ export const customCards = pgTable('custom_cards', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   content: text('content').notNull(),
+  points: text('points'), // Store as JSON string of Point[]
   page: text('page').notNull(), // The view name where it should appear
   color: text('color').default('blue').notNull(), // blue, green, purple, yellow, red
   isVisible: boolean('is_visible').default(true).notNull(),
@@ -109,8 +110,21 @@ export const userNotifications = pgTable('user_notifications', {
   unq: unique().on(t.userId, t.notificationId)
 }));
 
+export const offers = pgTable('offers', {
+  id: serial('id').primaryKey(),
+  brand: text('brand').notNull(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  price: text('price').notNull(),
+  imageUrl: text('image_url'),
+  aggregators: text('aggregators'), // Saved as comma-separated or JSON
+  startDate: timestamp('start_date'),
+  endDate: timestamp('end_date'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 export type Log = typeof logs.$inferSelect;
-export type NewLog = typeof logs.$inferInsert;
+export type NewLog = typeof logs.$inferSelect; // Insertion type can be inferred too but let's keep it consistent
 export type Request = typeof requests.$inferSelect;
 export type NewRequest = typeof requests.$inferInsert;
 export type CustomCard = typeof customCards.$inferSelect;
@@ -118,3 +132,5 @@ export type NewCustomCard = typeof customCards.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;
 export type NewNotification = typeof notifications.$inferInsert;
 export type UserNotification = typeof userNotifications.$inferSelect;
+export type Offer = typeof offers.$inferSelect;
+export type NewOffer = typeof offers.$inferInsert;
