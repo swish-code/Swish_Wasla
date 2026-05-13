@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import { db, setupDb } from "./src/db/index.ts";
-import { users, branches, tasks, contentOverrides, logs, requests, branchColumns, customCards, notifications, userNotifications } from "./src/db/schema.ts";
+import { users, branches, tasks, contentOverrides, logs, requests, branchColumns, customCards, notifications, userNotifications, offers } from "./src/db/schema.ts";
 import { BRANCH_DATA, TASK_DATA } from "./src/data.ts";
 import { eq, desc, ilike, or, asc, and } from "drizzle-orm";
 
@@ -28,7 +28,7 @@ async function startServer() {
     }
   });
 
-  app.use(express.json());
+  app.use(express.json({ limit: '10mb' }));
   app.use(cookieParser());
 
   // Background Database Setup
@@ -242,6 +242,38 @@ async function startServer() {
       res.json({ message: "User deleted" });
     } catch (err) {
       res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
+
+  app.put("/api/users/:id", authenticateToken, authorizeAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { email, password, name, role } = req.body;
+    try {
+      const updateData: any = { email, name, role, updatedAt: new Date() };
+      
+      if (password && password.trim() !== "") {
+        updateData.password = await bcrypt.hash(password, 10);
+      }
+
+      const [updatedUser] = await db.update(users)
+        .set(updateData)
+        .where(eq(users.id, parseInt(id)))
+        .returning({
+          id: users.id,
+          email: users.email,
+          name: users.name,
+          role: users.role
+        });
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      await createLog(req, "Update User", `Updated user ${updatedUser.email}`);
+      await broadcastNotification(req, "المستخدمين", "تعديل", `تم تعديل بيانات المستخدم: ${updatedUser.name}`);
+      res.json(updatedUser);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update user" });
     }
   });
 
@@ -572,7 +604,12 @@ async function startServer() {
   app.get("/api/custom-cards", authenticateToken, async (req, res) => {
     try {
       const data = await db.select().from(customCards).orderBy(desc(customCards.createdAt));
-      res.json(data);
+      // Parse points if it exists
+      const parsedData = data.map(card => ({
+        ...card,
+        points: card.points ? JSON.parse(card.points) : []
+      }));
+      res.json(parsedData);
     } catch (err) {
       res.status(500).json({ error: "Failed to fetch custom cards" });
     }
@@ -580,17 +617,21 @@ async function startServer() {
 
   app.post("/api/custom-cards", authenticateToken, authorizeAdmin, async (req, res) => {
     try {
-      const { title, content, page, color, isVisible } = req.body;
+      const { title, content, points, page, color, isVisible } = req.body;
       const [newCard] = await db.insert(customCards).values({
         title,
         content,
+        points: points ? JSON.stringify(points) : null,
         page,
         color: color || 'blue',
         isVisible: isVisible !== undefined ? isVisible : true
       }).returning();
       await createLog(req, "Create Custom Card", `Created card "${title}" for page ${page}`);
       await broadcastNotification(req, "البطاقات المخصصة", "إضافة", `تم إضافة بطاقة جديدة: "${title}"`);
-      res.json(newCard);
+      res.json({
+        ...newCard,
+        points: newCard.points ? JSON.parse(newCard.points) : []
+      });
     } catch (err) {
       res.status(500).json({ error: "Failed to create custom card" });
     }
@@ -598,14 +639,24 @@ async function startServer() {
 
   app.put("/api/custom-cards/:id", authenticateToken, authorizeAdmin, async (req, res) => {
     try {
-      const { title, content, page, color, isVisible } = req.body;
+      const { title, content, points, page, color, isVisible } = req.body;
       const [updated] = await db.update(customCards)
-        .set({ title, content, page, color, isVisible })
+        .set({ 
+          title, 
+          content, 
+          points: points ? JSON.stringify(points) : null,
+          page, 
+          color, 
+          isVisible 
+        })
         .where(eq(customCards.id, parseInt(req.params.id)))
         .returning();
       await createLog(req, "Update Custom Card", `Updated card "${title}"`);
       await broadcastNotification(req, "البطاقات المخصصة", "تعديل", `تم تحديث البطاقة: "${title}"`);
-      res.json(updated);
+      res.json({
+        ...updated,
+        points: updated.points ? JSON.parse(updated.points) : []
+      });
     } catch (err) {
       res.status(500).json({ error: "Failed to update custom card" });
     }
@@ -682,6 +733,81 @@ async function startServer() {
     } catch (err) {
       console.error("Failed to mark notifications as read:", err);
       res.status(500).json({ error: "Failed to mark notifications as read" });
+    }
+  });
+
+  // --- Offer Routes ---
+  app.get("/api/offers", authenticateToken, async (req, res) => {
+    try {
+      const allOffers = await db.select().from(offers).orderBy(desc(offers.createdAt));
+      res.json(allOffers);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch offers" });
+    }
+  });
+
+  app.post("/api/offers", authenticateToken, authorizeManager, async (req, res) => {
+    try {
+      const { brand, title, description, price, startDate, endDate, imageUrl, aggregators } = req.body;
+      const [newOffer] = await db.insert(offers).values({
+        brand,
+        title,
+        description,
+        price,
+        imageUrl,
+        aggregators,
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null
+      }).returning();
+
+      await createLog(req, "Create Offer", `Created offer "${title}" for brand ${brand}`);
+      await broadcastNotification(req, "العروض", "إضافة", `تم إضافة عرض جديد: "${title}" ماركة ${brand}`);
+      res.json(newOffer);
+    } catch (err) {
+      console.error("Failed to create offer:", err);
+      res.status(500).json({ error: "Failed to create offer" });
+    }
+  });
+
+  app.put("/api/offers/:id", authenticateToken, authorizeManager, async (req, res) => {
+    try {
+      const { brand, title, description, price, startDate, endDate, imageUrl, aggregators } = req.body;
+      const [updated] = await db.update(offers)
+        .set({
+          brand,
+          title,
+          description,
+          price,
+          imageUrl,
+          aggregators,
+          startDate: startDate ? new Date(startDate) : null,
+          endDate: endDate ? new Date(endDate) : null
+        })
+        .where(eq(offers.id, parseInt(req.params.id)))
+        .returning();
+
+      if (!updated) return res.status(404).json({ error: "Offer not found" });
+
+      await createLog(req, "Update Offer", `Updated offer "${title}"`);
+      await broadcastNotification(req, "العروض", "تعديل", `تم تحديث العرض: "${title}"`);
+      res.json(updated);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update offer" });
+    }
+  });
+
+  app.delete("/api/offers/:id", authenticateToken, authorizeManager, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const offerToDelete = await db.select().from(offers).where(eq(offers.id, id)).limit(1);
+      if (offerToDelete.length === 0) return res.status(404).json({ error: "Offer not found" });
+
+      await db.delete(offers).where(eq(offers.id, id));
+      await createLog(req, "Delete Offer", `Deleted offer "${offerToDelete[0].title}"`);
+      await broadcastNotification(req, "العروض", "حذف", `تم حذف العرض: "${offerToDelete[0].title}"`);
+      res.json({ message: "Offer deleted" });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to delete offer" });
     }
   });
 
