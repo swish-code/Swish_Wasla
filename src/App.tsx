@@ -3,7 +3,7 @@ import { Search, ChevronDown, ChevronUp, ChevronRight, Phone, MapPin, Clock, Cal
 import { motion, AnimatePresence } from 'motion/react';
 import { BRANCH_DATA, BRANDS, PROCESS_SCRIPTS, COMPLAINT_STATUSES, MEAT_SOURCES, CATERING_DATA, CANCELLATION_DATA, CONTACTS_DATA, ALLERGEN_DATA, INGERINES_DATA, TASK_DATA } from './data';
 import { BranchData, ViewType, User as UserType, AuthState, UserRole, BranchColumn } from './types';
-import Sidebar from './components/Sidebar';
+import TopNavbar from './components/TopNavbar';
 import BranchModal from './components/BranchModal';
 import TaskModal from './components/TaskModal';
 import NotificationCenter from './components/NotificationCenter';
@@ -700,7 +700,6 @@ export default function App() {
   const [isIngerinesDropdownOpen, setIsIngerinesDropdownOpen] = useState(false);
   const [selectedIngerinesBrand, setSelectedIngerinesBrand] = useState<string>('shakir');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
   const [pinnedViews, setPinnedViews] = useState<string[]>(() => {
     const saved = localStorage.getItem('pinnedViews');
@@ -1493,79 +1492,39 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] dark:bg-gray-950 font-sans text-[#333] dark:text-gray-300 selection:bg-blue-100 flex overflow-hidden transition-colors duration-500">
-      {/* Sidebar Navigation */}
-      <AnimatePresence>
-        {auth.isAuthenticated && (
-          <>
-            {/* Mobile Overlay */}
-            {isSidebarOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setIsSidebarOpen(false)}
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] lg:hidden"
-              />
-            )}
-            
-            <Sidebar 
-              isOpen={isSidebarOpen}
-              onClose={() => setIsSidebarOpen(false)}
-              isCollapsed={isSidebarCollapsed}
-              onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              currentView={currentView} 
-              setCurrentView={(view) => {
-                setCurrentView(view);
-                setIsSidebarOpen(false);
-              }} 
-              user={auth.user} 
-              onLogout={handleLogout} 
-              isAdmin={isAdmin}
-              setSelectedBrand={setSelectedBrand}
-              selectedBrand={selectedBrand}
-              setSelectedAllergenBrand={setSelectedAllergenBrand}
-              selectedAllergenBrand={selectedAllergenBrand}
-              setSelectedIngerinesBrand={setSelectedIngerinesBrand}
-              selectedIngerinesBrand={selectedIngerinesBrand}
-              selectedComplainBrand={selectedComplainBrand}
-              setSelectedComplainBrand={setSelectedComplainBrand}
-              pinnedViews={pinnedViews}
-              togglePin={togglePin}
-              onSearchOpen={() => setIsSearchOpen(true)}
-              isDarkMode={isDarkMode}
-              onToggleDarkMode={toggleDarkMode}
-            />
-          </>
-        )}
-      </AnimatePresence>
+    <div className="h-screen bg-[#f8f9fa] dark:bg-gray-950 font-sans text-[#333] dark:text-gray-300 selection:bg-blue-100 flex flex-col overflow-hidden transition-colors duration-500">
+      {/* Top Navigation */}
+      {auth.isAuthenticated && (
+        <TopNavbar
+          isOpen={isSidebarOpen}
+          onOpen={() => setIsSidebarOpen(true)}
+          onClose={() => setIsSidebarOpen(false)}
+          currentView={currentView}
+          setCurrentView={(view) => {
+            setCurrentView(view);
+            setIsSidebarOpen(false);
+          }}
+          user={auth.user}
+          onLogout={handleLogout}
+          isAdmin={isAdmin}
+          setSelectedBrand={setSelectedBrand}
+          selectedBrand={selectedBrand}
+          setSelectedAllergenBrand={setSelectedAllergenBrand}
+          selectedAllergenBrand={selectedAllergenBrand}
+          setSelectedIngerinesBrand={setSelectedIngerinesBrand}
+          selectedIngerinesBrand={selectedIngerinesBrand}
+          selectedComplainBrand={selectedComplainBrand}
+          setSelectedComplainBrand={setSelectedComplainBrand}
+          pinnedViews={pinnedViews}
+          togglePin={togglePin}
+          onSearchOpen={() => setIsSearchOpen(true)}
+          isDarkMode={isDarkMode}
+          onToggleDarkMode={toggleDarkMode}
+        />
+      )}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden relative bg-[#f8f9fa] dark:bg-gray-950 transition-colors duration-500">
-        {/* Mobile Header */}
-        {auth.isAuthenticated && (
-          <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50">
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => setIsSidebarOpen(true)}
-                className="p-2 -ml-2 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
-              >
-                <List size={24} />
-              </button>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-[#00965e] rounded-lg flex items-center justify-center text-white font-black text-sm">W</div>
-                <h1 className="text-sm font-black text-gray-900 dark:text-white tracking-tighter">WASLA</h1>
-              </div>
-            </div>
-            <button 
-              onClick={() => setIsSearchOpen(true)}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-            >
-              <Search size={20} />
-            </button>
-          </div>
-        )}
-        
+      <div className="flex-1 flex flex-col overflow-hidden relative bg-[#f8f9fa] dark:bg-gray-950 transition-colors duration-500">
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <GlobalSearch 
             isOpen={isSearchOpen}
