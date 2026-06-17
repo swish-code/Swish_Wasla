@@ -1855,10 +1855,10 @@ export default function App() {
 
               {selectedBrand && (
                 <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 dark:shadow-none overflow-hidden border border-gray-50 dark:border-gray-800">
-                  <div className="overflow-x-auto">
+                  <div className="overflow-auto max-h-[70vh] custom-scrollbar">
                     <table className="w-full text-center border-collapse">
-                      <thead>
-                        <tr className="bg-gray-50/50 dark:bg-gray-800/50 text-gray-400 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
+                      <thead className="sticky top-0 z-20">
+                        <tr className="bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
                           <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800">Brand</th>
                           <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[150px]">Branch Name</th>
                           <th className="px-6 py-5 text-[12px] font-black uppercase tracking-widest border-r border-gray-50 dark:border-gray-800 min-w-[250px]">Address</th>
@@ -2528,13 +2528,26 @@ export default function App() {
                         <IconComponent size={28} />
                       </div>
                       <h3 className="font-black text-gray-900 dark:text-white mb-6 text-sm tracking-tight leading-tight min-h-[40px] flex items-center justify-center">{item.title}</h3>
-                      <span className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all ${
-                        item.status === 'Open' 
-                          ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30 group-hover:bg-red-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-red-600/30' 
-                          : 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-900/30 group-hover:bg-teal-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-teal-600/30'
-                      }`}>
-                        {item.status}
-                      </span>
+                      {(() => {
+                        const statusKey = `complaint_status_${item.id}`;
+                        const cur = t(statusKey, item.status);
+                        const isOpen = cur === 'Open';
+                        const badgeCls = isOpen
+                          ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30 group-hover:bg-red-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-red-600/30'
+                          : 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-900/30 group-hover:bg-teal-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-teal-600/30';
+                        const base = 'px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all';
+                        return canEdit ? (
+                          <button
+                            onClick={() => handleSaveOverride(statusKey, isOpen ? 'Closed' : 'Open')}
+                            title="Click to toggle Open / Closed"
+                            className={`${base} cursor-pointer ${badgeCls}`}
+                          >
+                            {cur}
+                          </button>
+                        ) : (
+                          <span className={`${base} ${badgeCls}`}>{cur}</span>
+                        );
+                      })()}
                     </motion.div>
                   );
                 })}
