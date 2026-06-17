@@ -1456,6 +1456,22 @@ export const PROCESS_SCRIPTS = {
       "packaging-issue": {
         call: "Request a picture from the customer. If the item is still available, arrange return of the item. Action: Re-delivery / Refund",
         platform: "Request a picture from the customer. If the item is still available (not discarded), arrange a driver from our side to collect the item. Action: If a refund is requested, guide the customer to contact the aggregator. If re-delivery is requested, arrange it from our side"
+      },
+      "missing-condiment": {
+        call: "Review the order bill and confirm which condiment / sauce was missing. Request a food picture if needed. Action: Re-delivery / Refund of the missing condiment.",
+        platform: "Review the order bill and confirm which condiment / sauce was missing. Action: Guide the customer to contact the aggregator for either a refund or re-delivery of the missing condiment."
+      },
+      "missing-ingredients": {
+        call: "Review the order bill and ask which ingredient was missing from the item. Request a food picture from the customer. Action: Re-delivery / Refund of the affected item.",
+        platform: "Review the order bill and ask which ingredient was missing. Request a food picture from the customer. Action: Guide the customer to contact the aggregator for either a refund or re-delivery of the affected item."
+      },
+      "technical-issue": {
+        call: "Identify the technical issue (application, payment, or order). Apologize to the customer and escalate the issue to the concerned team. Action: Follow up with the customer until it is resolved.",
+        platform: "Identify the technical issue (application, payment, or order). Apologize to the customer and escalate the issue to the aggregator / concerned team. Action: Follow up until it is resolved."
+      },
+      "oily": {
+        call: "Request a picture from the customer. Action: Re-delivery / Refund",
+        platform: "Request a picture from the customer. If a refund is requested, guide them to the aggregator. If re-delivery is requested, arrange it from our side"
       }
     },
     notes: {
