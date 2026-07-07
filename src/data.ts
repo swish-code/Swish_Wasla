@@ -1472,6 +1472,14 @@ export const PROCESS_SCRIPTS = {
       "oily": {
         call: "Request a picture from the customer. Action: Re-delivery / Refund",
         platform: "Request a picture from the customer. If a refund is requested, guide them to the aggregator. If re-delivery is requested, arrange it from our side"
+      },
+      "spoiled": {
+        call: "Request a picture from the customer to confirm the spoilage. Apologize to the customer. Action: Re-delivery / Refund of the affected item.",
+        platform: "Request a picture from the customer to confirm the spoilage. Action: Guide the customer to contact the aggregator for either a refund or re-delivery of the affected item."
+      },
+      "insect": {
+        call: "Request a picture from the customer immediately. Escalate the complaint to the branch manager and quality team. Action: Full Re-delivery / Full Refund of the order.",
+        platform: "Request a picture from the customer immediately. Escalate the complaint to the branch manager and quality team. Action: Guide the customer to contact the aggregator for a full refund or re-delivery."
       }
     },
     notes: {
