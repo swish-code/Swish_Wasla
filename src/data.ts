@@ -2216,6 +2216,23 @@ export const CONTACTS_DATA = {
           { name: 'Pattie Talabat', url: 'https://www.talabat.com/kuwait/restaurant/705560/pattie-pattie?aid=27' },
           { name: 'Ordable Admin', url: 'https://www.yelopizza.com/manage/login' }
       ]
+    },
+    {
+      id: 'upay',
+      name: 'UPay',
+      icon: 'CreditCard',
+      url: 'https://upay.upayments.com/auth/login',
+      brands: [
+        { name: 'BBT',          user: 'ccbbt@swishhh.net',      pass: 'CallBBT@123'    },
+        { name: 'Just C',       user: 'CCJustC@swishhh.net',    pass: 'CallJustC@123'  },
+        { name: 'Chili Pepper', user: 'CCChili@swishhh.net',    pass: 'CallChili@123'  },
+        { name: 'Tabel',        user: 'CCTabel@swishhh.net',    pass: 'CallTabel@123'  },
+        { name: 'Yelo',         user: 'CCYelo@Swishhh.net',     pass: 'CallYelo!123'   },
+        { name: 'Mishmash',     user: 'ccmishmash@swishhh.net', pass: 'CallMish@123'   },
+        { name: 'Shakir',       user: 'ccshakir@swishhh.net',   pass: 'CallShakir@123' },
+        { name: 'FM',           user: 'ccfm@swishhh.net',       pass: 'FMCall@123'     },
+        { name: 'Pattie',       user: 'ccpattie@swishhh.net',   pass: 'CallPattie@123' }
+      ]
     }
   ],
   extensions: {
