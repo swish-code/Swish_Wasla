@@ -131,7 +131,6 @@ export default function TopNavbar({
       items: [
         { label: 'New Order Process', onClick: () => setCurrentView('new-order'), isActive: currentView === 'new-order', viewId: 'proc-new' },
         { label: 'Follow Up Process', onClick: () => setCurrentView('follow-up'), isActive: currentView === 'follow-up', viewId: 'proc-follow' },
-        { label: 'Offer', onClick: () => setCurrentView('offers'), isActive: currentView === 'offers', viewId: 'proc-offer' },
         { label: 'Complain Process', onClick: () => setCurrentView('complain'), isActive: currentView === 'complain', viewId: 'proc-complain' },
         { label: 'Complaint Status', onClick: () => setCurrentView('complaint-status'), isActive: currentView === 'complaint-status', viewId: 'proc-status' },
         { label: 'Additional', onClick: () => setCurrentView('additional'), isActive: currentView === 'additional', viewId: 'proc-additional' },
@@ -274,6 +273,18 @@ export default function TopNavbar({
               />
             </React.Fragment>
           ))}
+
+          {/* Offers (direct link) */}
+          <button
+            onClick={() => go(() => setCurrentView('offers'))}
+            className={`px-1.5 py-2 rounded-lg text-[13px] font-bold whitespace-nowrap transition-all ${
+              currentView === 'offers'
+                ? 'text-[#00965e] bg-[#00965e]/10'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+            }`}
+          >
+            Offers
+          </button>
 
           {/* Task Management (direct link) */}
           <button

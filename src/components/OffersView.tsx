@@ -17,7 +17,7 @@ export default function OffersView({ user }: OffersViewProps) {
   
   // New Offer Form State
   const [formData, setFormData] = useState({
-    brand: 'Shawarma Shakir',
+    brands: [] as string[],
     title: '',
     description: '',
     price: '',
@@ -28,7 +28,8 @@ export default function OffersView({ user }: OffersViewProps) {
   });
 
   const AGGREGATORS = ['Keeta', 'Talabat', 'Call center', 'Deliveroo', 'Web site'];
-  const BRANDS = ['All', 'Shawarma Shakir', 'Yelo Pizza', 'BBT', 'Slice', 'Pattie Pattie', 'Just C', 'Chili pepper', 'Tabel', 'Mishmash'];
+  const ALL_BRANDS = ['Shawarma Shakir', 'Yelo Pizza', 'BBT', 'Slice', 'Pattie Pattie', 'Just C', 'Chili pepper', 'Tabel', 'Mishmash'];
+  const BRANDS = ['All', ...ALL_BRANDS];
 
   const isLeader = user?.role === 'leader' || user?.role === 'admin';
 
@@ -72,12 +73,14 @@ export default function OffersView({ user }: OffersViewProps) {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.brands.length === 0) return;
     try {
       const url = editingOffer ? `/api/offers/${editingOffer.id}` : '/api/offers';
       const method = editingOffer ? 'PUT' : 'POST';
       
       const payload = {
         ...formData,
+        brand: formData.brands.join(','),
         aggregators: formData.aggregators.join(',')
       };
 
@@ -118,7 +121,7 @@ export default function OffersView({ user }: OffersViewProps) {
 
   const resetForm = () => {
     setFormData({
-      brand: 'Shawarma Shakir',
+      brands: [],
       title: '',
       description: '',
       price: '',
@@ -127,6 +130,15 @@ export default function OffersView({ user }: OffersViewProps) {
       imageUrl: '',
       aggregators: []
     });
+  };
+
+  const toggleBrand = (brand: string) => {
+    setFormData(prev => ({
+      ...prev,
+      brands: prev.brands.includes(brand)
+        ? prev.brands.filter(b => b !== brand)
+        : [...prev.brands, brand]
+    }));
   };
 
   const toggleAggregator = (agg: string) => {
@@ -157,7 +169,8 @@ export default function OffersView({ user }: OffersViewProps) {
       offer.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       offer.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesBrand = selectedBrand === 'All' || offer.brand === selectedBrand;
+    const offerBrands = offer.brand ? offer.brand.split(',').map(b => b.trim()) : [];
+    const matchesBrand = selectedBrand === 'All' || offerBrands.includes(selectedBrand);
 
     return matchesSearch && matchesBrand;
   });
@@ -246,10 +259,14 @@ export default function OffersView({ user }: OffersViewProps) {
               <div className={`relative z-10 ${offer.imageUrl ? 'mt-44' : ''}`}>
                 <div className="flex items-start justify-between mb-6">
                   <div className="space-y-1">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-600 text-[10px] font-black uppercase tracking-widest">
-                      <Building2 size={12} />
-                      {offer.brand}
-                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {(offer.brand ? offer.brand.split(',').map(b => b.trim()) : []).map((b, i) => (
+                        <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-600 text-[10px] font-black uppercase tracking-widest">
+                          <Building2 size={12} />
+                          {b}
+                        </span>
+                      ))}
+                    </div>
                     <h3 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight group-hover:text-orange-500 transition-colors uppercase">{offer.title}</h3>
                   </div>
                   {isLeader && (
@@ -258,14 +275,14 @@ export default function OffersView({ user }: OffersViewProps) {
                         onClick={() => {
                           setEditingOffer(offer);
                           setFormData({
-                            brand: offer.brand,
+                            brands: offer.brand ? offer.brand.split(',').map(b => b.trim()) : [],
                             title: offer.title,
                             description: offer.description,
                             price: offer.price,
                             startDate: offer.startDate || '',
                             endDate: offer.endDate || '',
                             imageUrl: offer.imageUrl || '',
-                            aggregators: offer.aggregators ? offer.aggregators.split(',') : []
+                            aggregators: offer.aggregators ? offer.aggregators.split(',').map(a => a.trim()) : []
                           });
                           setIsModalOpen(true);
                         }}
@@ -374,24 +391,29 @@ export default function OffersView({ user }: OffersViewProps) {
 
                 <form onSubmit={handleSave} className="space-y-8">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <label className="text-[11px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] ml-2">Brand Selection</label>
-                      <select
-                        required
-                        className="w-full bg-gray-50 dark:bg-gray-900 border-none rounded-2xl px-6 py-4 font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500/20 transition-all outline-none"
-                        value={formData.brand}
-                        onChange={(e) => setFormData({...formData, brand: e.target.value})}
-                      >
-                        <option value="Shawarma Shakir">Shawarma Shakir</option>
-                        <option value="Yelo Pizza">Yelo Pizza</option>
-                        <option value="BBT">BBT</option>
-                        <option value="Slice">Slice</option>
-                        <option value="Pattie Pattie">Pattie Pattie</option>
-                        <option value="Just C">Just C</option>
-                        <option value="Chili pepper">Chili pepper</option>
-                        <option value="Tabel">Tabel</option>
-                        <option value="Mishmash">Mishmash</option>
-                      </select>
+                    <div className="sm:col-span-2 space-y-3">
+                      <label className="text-[11px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] ml-2">
+                        Brand Selection <span className="text-orange-400">(select one or more)</span>
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {ALL_BRANDS.map(brand => (
+                          <button
+                            key={brand}
+                            type="button"
+                            onClick={() => toggleBrand(brand)}
+                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                              formData.brands.includes(brand)
+                                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+                                : 'bg-gray-50 dark:bg-gray-900 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                            }`}
+                          >
+                            {brand}
+                          </button>
+                        ))}
+                      </div>
+                      {formData.brands.length === 0 && (
+                        <p className="text-[10px] text-red-400 font-bold ml-2">Please select at least one brand</p>
+                      )}
                     </div>
 
                     <div className="space-y-3">
