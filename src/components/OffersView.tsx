@@ -308,7 +308,7 @@ export default function OffersView({ user }: OffersViewProps) {
                   ))}
                 </div>
 
-                <p className="text-gray-500 dark:text-gray-400 font-bold mb-8 italic line-clamp-3 min-h-[4.5rem]">
+                <p className="text-gray-500 dark:text-gray-400 font-bold mb-8 italic">
                   "{offer.description}"
                 </p>
 
