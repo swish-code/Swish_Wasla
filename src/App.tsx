@@ -838,6 +838,8 @@ export default function App() {
   const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<any | null>(null);
+  const [meatAddingBrand, setMeatAddingBrand] = useState<string | null>(null);
+  const [meatNewItem, setMeatNewItem] = useState({ label: '', value: '' });
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('wasla-theme');
@@ -5707,7 +5709,14 @@ export default function App() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {(Object.entries(MEAT_SOURCES) as any).map(([brandName, data]: [string, any]) => (
+                {(Object.entries(MEAT_SOURCES) as any).map(([brandName, data]: [string, any]) => {
+                  const extrasKey = `meat_source_${brandName.replace(/\s+/g, '_')}_extras`;
+                  const extrasRaw = t(extrasKey, '[]');
+                  let extras: { label: string; value: string }[] = [];
+                  try { extras = JSON.parse(extrasRaw); } catch { extras = []; }
+                  const isAdding = meatAddingBrand === brandName;
+
+                  return (
                   <motion.div
                     key={brandName}
                     whileHover={{ y: -5 }}
@@ -5722,7 +5731,7 @@ export default function App() {
                           <div key={idx} className="flex flex-col gap-1 border-b border-gray-50 dark:border-gray-800 pb-2 last:border-0">
                             <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">{item.label}</span>
                             <span className="text-gray-700 dark:text-gray-300 font-medium">
-                              <EditableText 
+                              <EditableText
                                 contentKey={`meat_source_${brandName.replace(/\s+/g, '_')}_item_${idx}`}
                                 defaultValue={t(`meat_source_${brandName.replace(/\s+/g, '_')}_item_${idx}`, item.value)}
                                 canEdit={canEdit}
@@ -5732,11 +5741,84 @@ export default function App() {
                             </span>
                           </div>
                         ))}
+
+                        {/* Extra items added via UI */}
+                        {extras.map((extra, idx) => (
+                          <div key={`extra-${idx}`} className="flex flex-col gap-1 border-b border-blue-50 dark:border-blue-900/30 pb-2 last:border-0">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] text-blue-400 dark:text-blue-500 font-bold uppercase tracking-wider">{extra.label}</span>
+                              {canEdit && (
+                                <button
+                                  onClick={() => {
+                                    const updated = extras.filter((_, i) => i !== idx);
+                                    handleSaveOverride(extrasKey, JSON.stringify(updated));
+                                  }}
+                                  className="text-red-400 hover:text-red-600 p-0.5 rounded transition-colors"
+                                  title="Delete"
+                                >
+                                  <X size={12} />
+                                </button>
+                              )}
+                            </div>
+                            <span className="text-gray-700 dark:text-gray-300 font-medium">{extra.value}</span>
+                          </div>
+                        ))}
                       </div>
+
+                      {/* Add Item Form */}
+                      {canEdit && (
+                        <div className="mt-4" dir="rtl">
+                          {isAdding ? (
+                            <div className="space-y-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
+                              <input
+                                type="text"
+                                placeholder="التسمية (مثال: اللحم البقري)"
+                                className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                value={meatNewItem.label}
+                                onChange={e => setMeatNewItem(p => ({ ...p, label: e.target.value }))}
+                              />
+                              <input
+                                type="text"
+                                placeholder="القيمة (مثال: الجمبري كويتي)"
+                                className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                value={meatNewItem.value}
+                                onChange={e => setMeatNewItem(p => ({ ...p, value: e.target.value }))}
+                              />
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => {
+                                    if (!meatNewItem.label.trim() || !meatNewItem.value.trim()) return;
+                                    const updated = [...extras, { label: meatNewItem.label.trim(), value: meatNewItem.value.trim() }];
+                                    handleSaveOverride(extrasKey, JSON.stringify(updated));
+                                    setMeatNewItem({ label: '', value: '' });
+                                    setMeatAddingBrand(null);
+                                  }}
+                                  className="flex-1 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
+                                >
+                                  <Check size={14} /> حفظ
+                                </button>
+                                <button
+                                  onClick={() => { setMeatAddingBrand(null); setMeatNewItem({ label: '', value: '' }); }}
+                                  className="py-2 px-3 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                >
+                                  <X size={14} />
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => { setMeatAddingBrand(brandName); setMeatNewItem({ label: '', value: '' }); }}
+                              className="w-full py-2 mt-1 border-2 border-dashed border-blue-200 dark:border-blue-800 text-blue-500 dark:text-blue-400 text-xs font-bold rounded-xl hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center gap-1"
+                            >
+                              <Plus size={14} /> إضافة عنصر
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="bg-gray-50 dark:bg-gray-800/50 py-3 px-6 border-t border-gray-100 dark:border-gray-800 text-center">
                       <div className="text-xs text-blue-600 dark:text-blue-400 font-bold" dir="rtl">
-                        <EditableText 
+                        <EditableText
                           contentKey={`meat_source_${brandName.replace(/\s+/g, '_')}_footer`}
                           defaultValue={t(`meat_source_${brandName.replace(/\s+/g, '_')}_footer`, data.footer)}
                           canEdit={canEdit}
@@ -5746,7 +5828,8 @@ export default function App() {
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                  );
+                })}
               </div>
             </motion.div>
           ) : (
