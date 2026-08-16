@@ -2050,6 +2050,80 @@ export default function App() {
                 </div>
               )}
 
+              {/* Brand Notes Box */}
+              {selectedBrand && (() => {
+                const notesKey = `branch_notes_${selectedBrand.replace(/\s+/g, '_')}`;
+                const notesValue = t(notesKey, '');
+                const [editingNotes, setEditingNotes] = React.useState(false);
+                const [notesDraft, setNotesDraft] = React.useState('');
+                if (!notesValue && !canEdit) return null;
+                return (
+                  <div className="mt-6 bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-lg overflow-hidden">
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+                      <div className="flex items-center gap-2 text-sm font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                        <Info size={16} />
+                        Notes & Info — {selectedBrand}
+                      </div>
+                      {canEdit && !editingNotes && (
+                        <button
+                          onClick={() => { setNotesDraft(notesValue); setEditingNotes(true); }}
+                          className="flex items-center gap-1.5 px-4 py-2 text-xs font-black text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors uppercase tracking-wider"
+                        >
+                          <Edit size={13} />
+                          {notesValue ? 'Edit' : 'Add Notes'}
+                        </button>
+                      )}
+                    </div>
+                    <div className="p-6">
+                      {editingNotes ? (
+                        <div className="space-y-3">
+                          <textarea
+                            autoFocus
+                            rows={5}
+                            className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-5 py-4 text-sm font-medium text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00965e]/30 resize-none"
+                            placeholder="اكتب ملاحظات أو معلومات إضافية لهذا البراند..."
+                            value={notesDraft}
+                            onChange={e => setNotesDraft(e.target.value)}
+                          />
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={async () => {
+                                await handleSaveOverride(notesKey, notesDraft);
+                                setEditingNotes(false);
+                              }}
+                              className="flex items-center gap-2 px-6 py-2.5 bg-[#00965e] text-white text-xs font-black rounded-xl hover:bg-[#007a4d] transition-colors uppercase tracking-wider"
+                            >
+                              <Check size={14} /> Save
+                            </button>
+                            {notesValue && (
+                              <button
+                                onClick={async () => {
+                                  await handleDeleteOverride(notesKey);
+                                  setEditingNotes(false);
+                                }}
+                                className="flex items-center gap-2 px-4 py-2.5 bg-red-50 dark:bg-red-900/20 text-red-500 text-xs font-black rounded-xl hover:bg-red-100 transition-colors uppercase tracking-wider"
+                              >
+                                <Trash2 size={14} /> Delete
+                              </button>
+                            )}
+                            <button
+                              onClick={() => setEditingNotes(false)}
+                              className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs font-black rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors uppercase tracking-wider"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : notesValue ? (
+                        <p className="text-gray-700 dark:text-gray-300 text-sm font-medium whitespace-pre-wrap leading-relaxed">{notesValue}</p>
+                      ) : (
+                        <p className="text-gray-400 dark:text-gray-600 text-sm font-bold italic text-center py-4">No notes added yet. Click "Add Notes" to get started.</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* Brand Specific Logic (BBT) */}
               {selectedBrand === 'BBT' && (
                 <div className="mt-12 max-w-2xl mx-auto space-y-4">
