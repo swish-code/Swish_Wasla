@@ -840,6 +840,8 @@ export default function App() {
   const [editingTask, setEditingTask] = useState<any | null>(null);
   const [meatAddingBrand, setMeatAddingBrand] = useState<string | null>(null);
   const [meatNewItem, setMeatNewItem] = useState({ label: '', value: '' });
+  const [notesEditingBrand, setNotesEditingBrand] = useState<string | null>(null);
+  const [notesDraft, setNotesDraft] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('wasla-theme');
@@ -2054,8 +2056,7 @@ export default function App() {
               {selectedBrand && (() => {
                 const notesKey = `branch_notes_${selectedBrand.replace(/\s+/g, '_')}`;
                 const notesValue = t(notesKey, '');
-                const [editingNotes, setEditingNotes] = React.useState(false);
-                const [notesDraft, setNotesDraft] = React.useState('');
+                const isEditing = notesEditingBrand === selectedBrand;
                 if (!notesValue && !canEdit) return null;
                 return (
                   <div className="mt-6 bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-lg overflow-hidden">
@@ -2064,9 +2065,9 @@ export default function App() {
                         <Info size={16} />
                         Notes & Info — {selectedBrand}
                       </div>
-                      {canEdit && !editingNotes && (
+                      {canEdit && !isEditing && (
                         <button
-                          onClick={() => { setNotesDraft(notesValue); setEditingNotes(true); }}
+                          onClick={() => { setNotesDraft(notesValue); setNotesEditingBrand(selectedBrand); }}
                           className="flex items-center gap-1.5 px-4 py-2 text-xs font-black text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors uppercase tracking-wider"
                         >
                           <Edit size={13} />
@@ -2075,7 +2076,7 @@ export default function App() {
                       )}
                     </div>
                     <div className="p-6">
-                      {editingNotes ? (
+                      {isEditing ? (
                         <div className="space-y-3">
                           <textarea
                             autoFocus
@@ -2089,7 +2090,7 @@ export default function App() {
                             <button
                               onClick={async () => {
                                 await handleSaveOverride(notesKey, notesDraft);
-                                setEditingNotes(false);
+                                setNotesEditingBrand(null);
                               }}
                               className="flex items-center gap-2 px-6 py-2.5 bg-[#00965e] text-white text-xs font-black rounded-xl hover:bg-[#007a4d] transition-colors uppercase tracking-wider"
                             >
@@ -2099,7 +2100,7 @@ export default function App() {
                               <button
                                 onClick={async () => {
                                   await handleDeleteOverride(notesKey);
-                                  setEditingNotes(false);
+                                  setNotesEditingBrand(null);
                                 }}
                                 className="flex items-center gap-2 px-4 py-2.5 bg-red-50 dark:bg-red-900/20 text-red-500 text-xs font-black rounded-xl hover:bg-red-100 transition-colors uppercase tracking-wider"
                               >
@@ -2107,7 +2108,7 @@ export default function App() {
                               </button>
                             )}
                             <button
-                              onClick={() => setEditingNotes(false)}
+                              onClick={() => setNotesEditingBrand(null)}
                               className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs font-black rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors uppercase tracking-wider"
                             >
                               Cancel
