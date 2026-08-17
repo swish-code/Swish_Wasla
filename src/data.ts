@@ -2879,6 +2879,18 @@ export const INGERINES_DATA = {
   chili: {
     title: "Chili Ingredients",
     items: []
+  },
+  mishmash: {
+    title: "Mishmash Ingredients",
+    items: []
+  },
+  bbt: {
+    title: "BBT Ingredients",
+    items: []
+  },
+  tabel: {
+    title: "Tabel Ingredients",
+    items: []
   }
 };
 

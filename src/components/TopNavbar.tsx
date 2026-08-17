@@ -203,6 +203,9 @@ export default function TopNavbar({
         { label: 'Just Ingredients', onClick: () => { setSelectedIngerinesBrand('just'); setCurrentView('ingerines'); }, isActive: currentView === 'ingerines' && selectedIngerinesBrand === 'just', viewId: 'ing-just' },
         { label: 'Yelo SOP', onClick: () => { setSelectedIngerinesBrand('yelo-sop'); setCurrentView('ingerines'); }, isActive: currentView === 'ingerines' && selectedIngerinesBrand === 'yelo-sop', viewId: 'ing-yelo-sop' },
         { label: 'Chili Ingredients', onClick: () => { setSelectedIngerinesBrand('chili'); setCurrentView('ingerines'); }, isActive: currentView === 'ingerines' && selectedIngerinesBrand === 'chili', viewId: 'ing-chili' },
+        { label: 'Mishmash Ingredients', onClick: () => { setSelectedIngerinesBrand('mishmash'); setCurrentView('ingerines'); }, isActive: currentView === 'ingerines' && selectedIngerinesBrand === 'mishmash', viewId: 'ing-mishmash' },
+        { label: 'BBT Ingredients', onClick: () => { setSelectedIngerinesBrand('bbt'); setCurrentView('ingerines'); }, isActive: currentView === 'ingerines' && selectedIngerinesBrand === 'bbt', viewId: 'ing-bbt' },
+        { label: 'Tabel Ingredients', onClick: () => { setSelectedIngerinesBrand('tabel'); setCurrentView('ingerines'); }, isActive: currentView === 'ingerines' && selectedIngerinesBrand === 'tabel', viewId: 'ing-tabel' },
       ],
     },
   ];
@@ -712,4 +715,7 @@ const ALL_NAV_ITEMS = [
   { id: 'ing-just', label: 'Just Ingredients', view: 'ingerines', subBrand: 'just', action: (sV: any, sB: any, sA: any, sI: any) => { sI('just'); sV('ingerines'); } },
   { id: 'ing-yelo-sop', label: 'Yelo SOP', view: 'ingerines', subBrand: 'yelo-sop', action: (sV: any, sB: any, sA: any, sI: any) => { sI('yelo-sop'); sV('ingerines'); } },
   { id: 'ing-chili', label: 'Chili Ingredients', view: 'ingerines', subBrand: 'chili', action: (sV: any, sB: any, sA: any, sI: any) => { sI('chili'); sV('ingerines'); } },
+  { id: 'ing-mishmash', label: 'Mishmash Ingredients', view: 'ingerines', subBrand: 'mishmash', action: (sV: any, sB: any, sA: any, sI: any) => { sI('mishmash'); sV('ingerines'); } },
+  { id: 'ing-bbt', label: 'BBT Ingredients', view: 'ingerines', subBrand: 'bbt', action: (sV: any, sB: any, sA: any, sI: any) => { sI('bbt'); sV('ingerines'); } },
+  { id: 'ing-tabel', label: 'Tabel Ingredients', view: 'ingerines', subBrand: 'tabel', action: (sV: any, sB: any, sA: any, sI: any) => { sI('tabel'); sV('ingerines'); } },
 ];

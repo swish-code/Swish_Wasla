@@ -63,6 +63,10 @@ const GlobalSearch = ({
       { id: 'all-mishmash', label: 'Mishmash Allergens', view: 'allergens', allergenBrand: 'mishmash', keywords: 'allergen mishmash حساسية' },
       { id: 'ing-shakir', label: 'Shakir Ingredients', view: 'ingerines', ingerinesBrand: 'shakir', keywords: 'ingredients shakir مكونات شاكر' },
       { id: 'ing-just', label: 'Just Ingredients', view: 'ingerines', ingerinesBrand: 'just', keywords: 'ingredients just مكونات جست' },
+      { id: 'ing-chili', label: 'Chili Ingredients', view: 'ingerines', ingerinesBrand: 'chili', keywords: 'ingredients chili مكونات تشيلي' },
+      { id: 'ing-mishmash', label: 'Mishmash Ingredients', view: 'ingerines', ingerinesBrand: 'mishmash', keywords: 'ingredients mishmash مكونات مشماش' },
+      { id: 'ing-bbt', label: 'BBT Ingredients', view: 'ingerines', ingerinesBrand: 'bbt', keywords: 'ingredients bbt مكونات بي بي تي' },
+      { id: 'ing-tabel', label: 'Tabel Ingredients', view: 'ingerines', ingerinesBrand: 'tabel', keywords: 'ingredients tabel مكونات تابل' },
     ];
 
     navItems.forEach(item => {
