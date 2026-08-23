@@ -2876,6 +2876,10 @@ export const INGERINES_DATA = {
     title: "Yelo SOP",
     items: []
   },
+  yelo: {
+    title: "Yelo Ingredients",
+    items: []
+  },
   chili: {
     title: "Chili Ingredients",
     items: []
