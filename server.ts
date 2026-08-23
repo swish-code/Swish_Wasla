@@ -372,15 +372,31 @@ async function startServer() {
       if (data.customData && typeof data.customData === 'object') {
         data.customData = JSON.stringify(data.customData);
       }
+
+      const [before] = await db.select().from(branches).where(eq(branches.id, parseInt(req.params.id))).limit(1);
+
       const [updated] = await db.update(branches)
         .set(data)
         .where(eq(branches.id, parseInt(req.params.id)))
         .returning();
-      
+
       if (!updated) {
         return res.status(404).json({ error: "Branch not found in database" });
       }
-      await createLog(req, "Update Branch", `Updated branch ${updated.branchName} (${updated.brand})`);
+
+      const changes: string[] = [];
+      if (before) {
+        for (const key of Object.keys(data)) {
+          const oldVal = (before as any)[key];
+          const newVal = (updated as any)[key];
+          if (oldVal !== newVal) {
+            changes.push(`${key}: "${oldVal ?? '—'}" → "${newVal ?? '—'}"`);
+          }
+        }
+      }
+      const changesSummary = changes.length > 0 ? ` | Changes: ${changes.join(', ')}` : '';
+
+      await createLog(req, "Update Branch", `Updated branch ${updated.branchName} (${updated.brand})${changesSummary}`);
       await broadcastNotification(req, "الفروع", "تعديل", `تم تحديث بيانات الفرع: ${updated.branchName} (${updated.brand})`);
       res.json(updated);
     } catch (err) {
