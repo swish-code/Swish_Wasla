@@ -1684,7 +1684,11 @@ export const CATERING_DATA = {
       { id: 2, title: '20 Persons', desc: '60 Sliders (Mix) + 20 Fries + 20 Drinks', price: '115.000 KD' },
       { id: 3, title: '30 Persons', desc: '90 Sliders (Mix) + 30 Fries + 30 Drinks', price: '150.000 KD' },
       { id: 4, title: '40 Persons', desc: '120 Sliders (Mix) + 40 Fries + 40 Drinks', price: '195.000 KD' },
-      { id: 5, title: 'Extra Meal', desc: 'We Can add all sides except Chicken Nuggets 10 Pcs, Beef Cruch and Pattie Fries', price: '4.350 KD' }
+      { id: 5, title: 'Extra Meal', desc: 'We Can add all sides except Chicken Nuggets 10 Pcs, Beef Cruch and Pattie Fries', price: '4.350 KD' },
+      { id: 6, title: '15 Persons Plus', desc: '30 Sliders Plus + 15 Fries + 15 Drinks Mix', price: '95.000 KD' },
+      { id: 7, title: '20 Persons Plus', desc: '40 Sliders Plus + 20 Fries + 20 Drinks Mix', price: '110.000 KD' },
+      { id: 8, title: '30 Persons Plus', desc: '60 Sliders Plus + 30 Fries + 30 Drinks Mix', price: '150.000 KD' },
+      { id: 9, title: '40 Persons Plus', desc: '80 Sliders Plus + 40 Fries + 40 Drinks Mix', price: '195.000 KD' }
     ],
     terms: [
       'Service hours 12:00 PM - 11:55 PM',
