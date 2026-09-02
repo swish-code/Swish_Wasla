@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, ChevronUp, ChevronRight, Phone, MapPin, Clock, Calendar, Globe, Star, Info, MessageSquare, AlertCircle, ShoppingBag, X, Beaker, User, Package, Skull, CalendarX, Frown, Wind, Waves, Flame, Archive, Repeat, Scale, Droplets, FlaskConical, Beef, AlertTriangle, Snowflake, Settings, PackageOpen, UserCircle, HelpCircle, ListChecks, Store, Smartphone, List, PencilLine, Image, Send, Bell, CreditCard, Truck, Users, Mail, Zap, Lock, LogOut, Plus, Trash2, Edit, Database, PhoneCall, XCircle, Activity, CloudRain, BarChart, ClipboardList, CheckCircle2, Check, RefreshCw, ArrowRight } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, ChevronRight, Phone, MapPin, Clock, Calendar, Globe, Star, Info, MessageSquare, AlertCircle, ShoppingBag, X, Beaker, User, Package, Skull, CalendarX, Frown, Wind, Waves, Flame, Archive, Repeat, Scale, Droplets, FlaskConical, Beef, AlertTriangle, Snowflake, Settings, PackageOpen, UserCircle, HelpCircle, ListChecks, Store, Smartphone, List, PencilLine, Image, Send, Bell, CreditCard, Truck, Users, Mail, Zap, Lock, LogOut, Plus, Trash2, Edit, Database, PhoneCall, XCircle, Activity, CloudRain, BarChart, ClipboardList, CheckCircle2, Check, RefreshCw, ArrowRight, Timer, Plug, Fan, Trees, Ruler, ChefHat, UtensilsCrossed } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BRANCH_DATA, BRANDS, PROCESS_SCRIPTS, COMPLAINT_STATUSES, MEAT_SOURCES, CATERING_DATA, CANCELLATION_DATA, CONTACTS_DATA, ALLERGEN_DATA, INGERINES_DATA, TASK_DATA } from './data';
 import { BranchData, ViewType, User as UserType, AuthState, UserRole, BranchColumn } from './types';
@@ -695,6 +695,7 @@ export default function App() {
   const [selectedSpecialRequestsSubtype, setSelectedSpecialRequestsSubtype] = useState<string>('aggregators');
   const [selectedTalabatKeetaSubtype, setSelectedTalabatKeetaSubtype] = useState<'talabat' | 'keeta'>('talabat');
   const [selectedCateringBrand, setSelectedCateringBrand] = useState<'Pattie' | 'Slice' | 'Just C' | 'Mishmash'>('Pattie');
+  const [cateringDetailPkg, setCateringDetailPkg] = useState<any | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string>('myFatoora');
   const [isCateringDropdownOpen, setIsCateringDropdownOpen] = useState(false);
   const [isCancellationDropdownOpen, setIsCancellationDropdownOpen] = useState(false);
@@ -3101,19 +3102,193 @@ export default function App() {
                               isTextArea
                             />
                           </div>
-                          <div className="text-3xl font-black text-orange-600 tracking-tighter">
-                            <EditableText 
-                              contentKey={`catering_${selectedCateringBrand}_pkg_${pkg.id}_price`}
-                              defaultValue={t(`catering_${selectedCateringBrand}_pkg_${pkg.id}_price`, pkg.price)}
-                              canEdit={canEdit}
-                              onSave={handleSaveOverride}
-                              onDelete={handleDeleteOverride}
-                            />
+                          <div>
+                            <div className="text-3xl font-black text-orange-600 tracking-tighter">
+                              <EditableText
+                                contentKey={`catering_${selectedCateringBrand}_pkg_${pkg.id}_price`}
+                                defaultValue={t(`catering_${selectedCateringBrand}_pkg_${pkg.id}_price`, pkg.price)}
+                                canEdit={canEdit}
+                                onSave={handleSaveOverride}
+                                onDelete={handleDeleteOverride}
+                              />
+                            </div>
+                            {pkg.details && (
+                              <button
+                                onClick={() => setCateringDetailPkg(pkg)}
+                                className="mt-6 w-full py-3 rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 text-xs font-black uppercase tracking-widest hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white transition-all flex items-center justify-center gap-2"
+                              >
+                                <Info size={14} />
+                                View Details
+                              </button>
+                            )}
                           </div>
                         </div>
                       </motion.div>
                     ))}
                   </div>
+
+                  {/* Package Details Modal */}
+                  <AnimatePresence>
+                    {cateringDetailPkg?.details && (() => {
+                      const d = cateringDetailPkg.details;
+                      const pk = `catering_${selectedCateringBrand}_pkg_${cateringDetailPkg.id}_detail`;
+                      const specs = [
+                        { icon: Timer, value: d.setupTime, label: 'Set-up Time' },
+                        { icon: Clock, value: d.maxTime, label: 'Max Time' },
+                        { icon: Plug, value: d.electric, label: 'Electric Outlet' },
+                        { icon: Fan, value: d.ventilation, label: 'Ventilation' },
+                        { icon: Trees, value: d.outdoors, label: 'Outdoors' },
+                        { icon: Ruler, value: d.dimensions, label: 'Dimension details' },
+                      ];
+                      return (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setCateringDetailPkg(null)}
+                            className="absolute inset-0 bg-gray-900/50 backdrop-blur-md"
+                          />
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative w-full max-w-3xl max-h-[90vh] bg-white dark:bg-gray-950 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col"
+                          >
+                            {/* Header */}
+                            <div className="bg-orange-600 px-8 py-6 flex items-center justify-between gap-4 relative overflow-hidden flex-shrink-0">
+                              <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>
+                              <div className="relative z-10 min-w-0">
+                                <span className="text-white/70 text-[10px] font-black uppercase tracking-[0.3em] block mb-1">{selectedCateringBrand} Catering</span>
+                                <h2 className="text-white font-black text-xl sm:text-3xl tracking-tight leading-tight">{cateringDetailPkg.title}</h2>
+                              </div>
+                              <div className="relative z-10 flex items-center gap-3 flex-shrink-0">
+                                <span className="text-white font-black text-xl sm:text-2xl whitespace-nowrap">
+                                  {t(`catering_${selectedCateringBrand}_pkg_${cateringDetailPkg.id}_price`, cateringDetailPkg.price)}
+                                </span>
+                                <button
+                                  onClick={() => setCateringDetailPkg(null)}
+                                  className="p-2.5 bg-white/15 hover:bg-white/30 text-white rounded-xl transition-colors"
+                                >
+                                  <X size={20} />
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Body */}
+                            <div className="overflow-y-auto custom-scrollbar p-8 space-y-8">
+                              {/* Station specs */}
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                {specs.map((s, i) => (
+                                  <div key={i} className="flex items-start gap-3 p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+                                    <div className="w-9 h-9 rounded-xl bg-orange-100 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center flex-shrink-0">
+                                      <s.icon size={18} />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <div className="text-sm font-black text-gray-900 dark:text-white leading-tight">{s.value}</div>
+                                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">{s.label}</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Serves */}
+                              <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20">
+                                <Users size={20} className="text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                                <div className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                                  <span className="text-orange-600 dark:text-orange-400 font-black">Serves: </span>
+                                  <EditableText
+                                    contentKey={`${pk}_serves`}
+                                    defaultValue={t(`${pk}_serves`, d.serves)}
+                                    canEdit={canEdit}
+                                    onSave={handleSaveOverride}
+                                    onDelete={handleDeleteOverride}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Options (e.g. burger choice) */}
+                              {d.options && (
+                                <div>
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">{d.options.label}</span>
+                                    <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-wider">Required · Choose 1</span>
+                                  </div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {d.options.choices.map((c: string) => (
+                                      <span key={c} className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs font-black">{c}</span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Food */}
+                              <div>
+                                <div className="flex items-center gap-3 mb-4">
+                                  <div className="w-10 h-10 rounded-xl bg-orange-600 text-white flex items-center justify-center shadow-lg shadow-orange-600/30">
+                                    <UtensilsCrossed size={18} />
+                                  </div>
+                                  <div>
+                                    <h3 className="text-lg font-black text-gray-900 dark:text-white tracking-tight leading-none">Food</h3>
+                                    {d.foodNote && <p className="text-[11px] font-bold text-gray-400 mt-1">{d.foodNote}</p>}
+                                  </div>
+                                </div>
+                                <div className="space-y-3">
+                                  {d.food.map((f: any, idx: number) => (
+                                    <div key={idx} className="grid grid-cols-[110px_1fr] gap-4 items-start p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+                                      <span className="text-[11px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest pt-0.5">{f.label}</span>
+                                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300 leading-relaxed">
+                                        <EditableText
+                                          contentKey={`${pk}_food_${idx}`}
+                                          defaultValue={t(`${pk}_food_${idx}`, f.value)}
+                                          canEdit={canEdit}
+                                          onSave={handleSaveOverride}
+                                          onDelete={handleDeleteOverride}
+                                          isTextArea
+                                        />
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Service & Notes */}
+                              <div className="space-y-3">
+                                <div className="flex items-start gap-3 p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+                                  <ChefHat size={18} className="text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+                                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                                    <span className="font-black text-gray-900 dark:text-white">Service & Presentation: </span>
+                                    <EditableText
+                                      contentKey={`${pk}_service`}
+                                      defaultValue={t(`${pk}_service`, d.service)}
+                                      canEdit={canEdit}
+                                      onSave={handleSaveOverride}
+                                      onDelete={handleDeleteOverride}
+                                    />
+                                  </div>
+                                </div>
+                                {d.notes.map((n: string, idx: number) => (
+                                  <div key={idx} className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20">
+                                    <AlertTriangle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                                    <div className="text-sm text-gray-700 dark:text-gray-300">
+                                      <span className="font-black text-gray-900 dark:text-white">Note {idx + 1}: </span>
+                                      <EditableText
+                                        contentKey={`${pk}_note_${idx}`}
+                                        defaultValue={t(`${pk}_note_${idx}`, n)}
+                                        canEdit={canEdit}
+                                        onSave={handleSaveOverride}
+                                        onDelete={handleDeleteOverride}
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        </div>
+                      );
+                    })()}
+                  </AnimatePresence>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto mb-24">
                     <div className="bg-gray-50 dark:bg-gray-800/50 rounded-[3rem] p-12 border border-gray-100 dark:border-gray-700">

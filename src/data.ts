@@ -1677,6 +1677,60 @@ export const PROCESS_SCRIPTS = {
   ]
 };
 
+// Shared station specs for every Mishmash catering package
+const MISHMASH_STATION_COMMON = {
+  setupTime: '1 Hour',
+  maxTime: '2 Hours',
+  electric: 'Required',
+  ventilation: 'Required',
+  outdoors: 'Required',
+  dimensions: '3 m width x 4 m height',
+  service: '2 Chef, 2 Servers, Disposable Platters & Cutlery',
+  notes: [
+    'Station Unavailable for Basement or Upper Floors',
+    'The Station is Available Outdoors Only'
+  ]
+};
+
+const mishmashGrills = (persons: number, mains: string) => ({
+  ...MISHMASH_STATION_COMMON,
+  serves: `${persons} Persons with Option to Add Count`,
+  food: [
+    { label: 'Mains', value: mains },
+    { label: 'Appetizers', value: 'Grilled Wings, Tabbouleh Salad, Peanut Butter Coleslaw, Mishmash Bread, French Fries, Lebanese Bread' },
+    { label: 'Sauces', value: 'Hummus, Mutabbal, Garlic Sauce, Spicy Ranch, Khashkhash Sauce, Ketchup' },
+    { label: 'Desserts', value: `${persons} Belgian Chocolate Cookies` },
+    { label: 'Drinks', value: `${persons} Assorted Soft Drinks & ${persons} Water` }
+  ]
+});
+
+const mishmashBurger = (persons: number) => ({
+  ...MISHMASH_STATION_COMMON,
+  serves: `${persons} Persons with Option to Add Count`,
+  foodNote: 'Per Person: 1 Burger, 6 Appetizers, 7 Sauces, 1 Dessert, 2 Drinks',
+  options: { label: 'Burger', choices: ['Beef', 'Chicken', 'Beef & Chicken'] },
+  food: [
+    { label: 'Burger', value: 'Choice of Burger' },
+    { label: 'Sauces', value: 'Honey Mustard Sauce, Ranch Sauce, Special Cheese Sauce, Special BBQ Sauce, Mayo, Ketchup, Buffalo Sauce' },
+    { label: 'Appetizers', value: 'French Fries, Cheese Fries, Mishmash Fries, Chicken Bites, Onion Rings, Peanut Butter Coleslaw' },
+    { label: 'Desserts', value: 'Belgian Chocolate Cookies' },
+    { label: 'Drinks', value: 'Assorted Soft Drinks & Water' }
+  ]
+});
+
+const mishmashPhilly = (persons: number) => ({
+  ...MISHMASH_STATION_COMMON,
+  serves: `${persons} Persons with Option to Add Count`,
+  foodNote: 'Per Person: 1 Sandwich, 6 Appetizers, 1 Dessert, 2 Drinks, 6 Sauces',
+  food: [
+    { label: 'Mains', value: 'Philly Steak Sandwiches (Chicken & Beef)' },
+    { label: 'Sauces', value: 'Honey Mustard Sauce, Ranch Sauce, Special Cheese Sauce, Special BBQ Sauce, Mayo, Ketchup' },
+    { label: 'Appetizers', value: 'French Fries, Cheese Fries, Mishmash Fries, Chicken Bites, Onion Rings, Peanut Butter Coleslaw, Peanuts' },
+    { label: 'Desserts', value: 'Belgian Chocolate Cookies' },
+    { label: 'Drinks', value: 'Assorted Soft Drinks & Water' }
+  ]
+});
+
 export const CATERING_DATA = {
   'Pattie': {
     packages: [
@@ -1764,15 +1818,18 @@ export const CATERING_DATA = {
   },
   'Mishmash': {
     packages: [
-      { id: 1, title: 'Grills Station for 15 Persons', desc: 'Shish tawook, kebab, hummus & more', price: '150.000 KD' },
-      { id: 2, title: 'Grills Station for 25 Persons', desc: 'Shish tawook, kebab, hummus & more', price: '220.000 KD' },
-      { id: 3, title: 'Grills Station for 35 Persons', desc: 'Shish tawook, kebab, hummus & more', price: '270.000 KD' },
-      { id: 4, title: 'Burger Station for 15 Persons', desc: 'Burger, sauces & more', price: '95.000 KD' },
-      { id: 5, title: 'Burger Station for 25 Persons', desc: 'Burger, sauces & more', price: '145.000 KD' },
-      { id: 6, title: 'Burger Station for 35 Persons', desc: 'Burger, sauces & more', price: '195.000 KD' },
-      { id: 7, title: 'Philly Steak Station for 15 Persons', desc: '15 philly steak, sauces & more', price: '95.000 KD' },
-      { id: 8, title: 'Philly Steak Station for 25 Persons', desc: '25 philly steak, sauces & more', price: '145.000 KD' },
-      { id: 9, title: 'Philly Steak Station for 35 Persons', desc: '35 philly steak, sauces & more', price: '195.000 KD' }
+      { id: 1, title: 'Grills Station for 15 Persons', desc: 'Shish tawook, kebab, hummus & more', price: '150.000 KD',
+        details: mishmashGrills(15, '23 Skewers of Tawouk, 15 Skewers of Kabab, 15 Skewers of Tenderloin Beef Tikka, 5 Deboned Whole Chickens, 4 Beef Arayis, 3 Arayis with Cheese, Rice, Grilled Wraps') },
+      { id: 2, title: 'Grills Station for 25 Persons', desc: 'Shish tawook, kebab, hummus & more', price: '220.000 KD',
+        details: mishmashGrills(25, '38 Skewers of Tawouk, 25 Skewers of Kabab, 25 Skewers of Tenderloin Beef Tikka, 8 Deboned Whole Chickens, 7 Beef Arayis, 5 Arayis with Cheese, Rice, Grilled Wraps') },
+      { id: 3, title: 'Grills Station for 35 Persons', desc: 'Shish tawook, kebab, hummus & more', price: '270.000 KD',
+        details: mishmashGrills(35, '54 Skewers of Tawouk, 35 Skewers of Kabab, 35 Skewers of Tenderloin Beef Tikka, 12 Deboned Whole Chickens, 9 Beef Arayis, 7 Arayis with Cheese, Rice, Grilled Wraps') },
+      { id: 4, title: 'Burger Station for 15 Persons', desc: 'Burger, sauces & more', price: '95.000 KD', details: mishmashBurger(15) },
+      { id: 5, title: 'Burger Station for 25 Persons', desc: 'Burger, sauces & more', price: '145.000 KD', details: mishmashBurger(25) },
+      { id: 6, title: 'Burger Station for 35 Persons', desc: 'Burger, sauces & more', price: '195.000 KD', details: mishmashBurger(35) },
+      { id: 7, title: 'Philly Steak Station for 15 Persons', desc: '15 philly steak, sauces & more', price: '95.000 KD', details: mishmashPhilly(15) },
+      { id: 8, title: 'Philly Steak Station for 25 Persons', desc: '25 philly steak, sauces & more', price: '145.000 KD', details: mishmashPhilly(25) },
+      { id: 9, title: 'Philly Steak Station for 35 Persons', desc: '35 philly steak, sauces & more', price: '195.000 KD', details: mishmashPhilly(35) }
     ],
     terms: [
       'Service hours 12:00 PM - 11:55 PM',
