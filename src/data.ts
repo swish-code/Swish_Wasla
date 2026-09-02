@@ -1762,6 +1762,35 @@ export const CATERING_DATA = {
       'Catering is not available on the roof or in the basements'
     ]
   },
+  'Mishmash': {
+    packages: [
+      { id: 1, title: 'Grills Station for 15 Persons', desc: 'Shish tawook, kebab, hummus & more', price: '150.000 KD' },
+      { id: 2, title: 'Grills Station for 25 Persons', desc: 'Shish tawook, kebab, hummus & more', price: '220.000 KD' },
+      { id: 3, title: 'Grills Station for 35 Persons', desc: 'Shish tawook, kebab, hummus & more', price: '270.000 KD' },
+      { id: 4, title: 'Burger Station for 15 Persons', desc: 'Burger, sauces & more', price: '95.000 KD' },
+      { id: 5, title: 'Burger Station for 25 Persons', desc: 'Burger, sauces & more', price: '145.000 KD' },
+      { id: 6, title: 'Burger Station for 35 Persons', desc: 'Burger, sauces & more', price: '195.000 KD' },
+      { id: 7, title: 'Philly Steak Station for 15 Persons', desc: '15 philly steak, sauces & more', price: '95.000 KD' },
+      { id: 8, title: 'Philly Steak Station for 25 Persons', desc: '25 philly steak, sauces & more', price: '145.000 KD' },
+      { id: 9, title: 'Philly Steak Station for 35 Persons', desc: '35 philly steak, sauces & more', price: '195.000 KD' }
+    ],
+    terms: [
+      'Service hours 12:00 PM - 11:55 PM',
+      'Male employees only',
+      'Setup time 1h 30m at customer venue',
+      'Electricity required',
+      'Online payment only',
+      'Cancellation within 24h -> 50% non-refundable',
+      'The maximum limit for booking per day is 1 station'
+    ],
+    facilities: [
+      'Grill Machine (Needs Electricity)',
+      'Gas',
+      'Fryer Small Size',
+      'Size 2M x 2M',
+      'Catering is not available on the roof or in the basements'
+    ]
+  },
   remoteAreas: [
     { location: 'Liah - Jahra', price: '15.000' },
     { location: 'Mutlaa - Jahra', price: '15.000' },

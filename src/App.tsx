@@ -694,7 +694,7 @@ export default function App() {
   const [selectedAdditionalSubtype, setSelectedAdditionalSubtype] = useState<string>('aggregators');
   const [selectedSpecialRequestsSubtype, setSelectedSpecialRequestsSubtype] = useState<string>('aggregators');
   const [selectedTalabatKeetaSubtype, setSelectedTalabatKeetaSubtype] = useState<'talabat' | 'keeta'>('talabat');
-  const [selectedCateringBrand, setSelectedCateringBrand] = useState<'Pattie' | 'Slice' | 'Just C'>('Pattie');
+  const [selectedCateringBrand, setSelectedCateringBrand] = useState<'Pattie' | 'Slice' | 'Just C' | 'Mishmash'>('Pattie');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('myFatoora');
   const [isCateringDropdownOpen, setIsCateringDropdownOpen] = useState(false);
   const [isCancellationDropdownOpen, setIsCancellationDropdownOpen] = useState(false);
@@ -3059,7 +3059,7 @@ export default function App() {
 
               <div className="flex justify-center mb-16">
                 <div className="inline-flex bg-white dark:bg-gray-900 p-1.5 rounded-2xl shadow-xl shadow-blue-500/5 dark:shadow-none border border-gray-100 dark:border-gray-800">
-                  {(['Pattie', 'Slice', 'Just C'] as const).map((brand) => (
+                  {(['Pattie', 'Slice', 'Just C', 'Mishmash'] as const).map((brand) => (
                     <button
                       key={brand}
                       onClick={() => setSelectedCateringBrand(brand)}
