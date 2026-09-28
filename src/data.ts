@@ -2353,6 +2353,24 @@ export const CONTACTS_DATA = {
         { name: 'FM',           user: 'ccfm@swishhh.net',       pass: 'FMCall@123'     },
         { name: 'Pattie',       user: 'ccpattie@swishhh.net',   pass: 'CallPattie@123' }
       ]
+    },
+    {
+      id: 'snoonu',
+      name: 'Snoonu',
+      icon: 'ShoppingBag',
+      url: 'https://snoonu-portal.snoonu.com',
+      brands: [
+        { name: 'Yelo',          user: 'yelopizzamanager@snoonu.com',        pass: '(Vx6Xg9GDn'  },
+        { name: 'Pattie Pattie', user: 'pattiepattieslidersmanager@snoonu.com', pass: 'apCXwf=jD7' },
+        { name: 'BBT',           user: 'bbtmanager@snoonu.com',              pass: 'q6Eb(OExd0'  },
+        { name: 'FM',            user: 'forevermoremanager@snoonu.com',      pass: 'idbb09S8v='  },
+        { name: 'Mishmash',      user: 'mishmashmanager@snoonu.com',         pass: 'XG4XYMx9<1'  },
+        { name: 'Shawarma Shakir', user: 'shawarmashakirmanager@snoonu.com', pass: '<t7ZxpZoBh'  },
+        { name: 'Slice',         user: 'slicedonermanager@snoonu.com',       pass: 'r0V+dKFxev'  },
+        { name: 'Tabel',         user: 'tabelmanager@snoonu.com',            pass: 'UT:dECHvN4'  },
+        { name: 'Just C',        user: 'justcmanager@snoonu.com',            pass: '8MKO32oTr#'  },
+        { name: 'Chili Pepper',  user: 'chilipeppermanager@snoonu.com',      pass: 'FsB_S50Fol'  }
+      ]
     }
   ],
   extensions: {
