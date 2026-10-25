@@ -1,14 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Plus, Edit, Trash2, Calendar, Tag, DollarSign, Building2, Info, AlertCircle, Check, X, ArrowRight, Image as ImageIcon, Upload } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Calendar, Tag, DollarSign, Building2, Info, AlertCircle, Check, X, ArrowRight, Image as ImageIcon, Upload, Eye } from 'lucide-react';
 import { Offer, User } from '../types';
 
 interface OffersViewProps {
   user: User | null;
 }
 
+// The offer text is typed by leaders line by line (a brand, then its offer under it ...). Show it exactly as it was typed:
+// every line stays on its own line, "Label: value" lines get a bold label, bullets / numbers stay as list rows.
+export function FormattedOfferText({ text }: { text: string }) {
+  const lines = String(text || '').replace(/\r\n?/g, '\n').split('\n');
+  return (
+    <div className="space-y-2" dir="auto">
+      {lines.map((raw, i) => {
+        const line = raw.trim();
+        if (!line) return <div key={i} className="h-2" />;
+        const bullet = /^([-•*–]|\d+[.)])\s+(.*)$/.exec(line);
+        if (bullet) {
+          return (
+            <div key={i} className="flex gap-3 items-start" dir="auto">
+              <span className="mt-0.5 min-w-[1.5rem] h-6 px-1.5 rounded-lg bg-orange-500/10 text-orange-600 text-[11px] font-black flex items-center justify-center shrink-0">
+                {/^\d/.test(bullet[1]) ? bullet[1].replace(/[.)]/, '') : '•'}
+              </span>
+              <span className="font-bold text-gray-800 dark:text-gray-100 leading-relaxed">{bullet[2]}</span>
+            </div>
+          );
+        }
+        const kv = /^([^:：\n]{1,40})[:：]\s*(.+)$/.exec(line);
+        if (kv) {
+          return (
+            <div key={i} className="rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 px-4 py-3" dir="auto">
+              <div className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1">{kv[1]}</div>
+              <div className="font-bold text-gray-800 dark:text-gray-100 leading-relaxed">{kv[2]}</div>
+            </div>
+          );
+        }
+        return <p key={i} className="font-bold text-gray-800 dark:text-gray-100 leading-relaxed" dir="auto">{line}</p>;
+      })}
+    </div>
+  );
+}
+
 export default function OffersView({ user }: OffersViewProps) {
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [viewOffer, setViewOffer] = useState<Offer | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,7 +64,7 @@ export default function OffersView({ user }: OffersViewProps) {
   });
 
   const AGGREGATORS = ['Keeta', 'Talabat', 'Call center', 'Deliveroo', 'Web site'];
-  const ALL_BRANDS = ['Shawarma Shakir', 'Yelo Pizza', 'BBT', 'Slice', 'Pattie Pattie', 'Just C', 'Chili pepper', 'Tabel', 'Mishmash'];
+  const ALL_BRANDS = ['Shawarma Shakir', 'Yelo Pizza', 'BBT', 'Slice', 'Pattie Pattie', 'Just C', 'Chili pepper', 'Tabel', 'Mishmash', 'Forever More'];
   const BRANDS = ['All', ...ALL_BRANDS];
 
   const isLeader = user?.role === 'leader' || user?.role === 'admin';
@@ -308,9 +344,18 @@ export default function OffersView({ user }: OffersViewProps) {
                   ))}
                 </div>
 
-                <p className="text-gray-500 dark:text-gray-400 font-bold mb-8 italic">
+                <p className="text-gray-500 dark:text-gray-400 font-bold mb-4 italic line-clamp-4" dir="auto">
                   "{offer.description}"
                 </p>
+                <button
+                  type="button"
+                  onClick={() => setViewOffer(offer)}
+                  className="mb-8 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500/10 text-orange-600 hover:bg-orange-500 hover:text-white font-black text-[11px] uppercase tracking-widest transition-all active:scale-95"
+                  title="View the offer details"
+                >
+                  <Eye size={16} />
+                  View details
+                </button>
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800">
@@ -355,6 +400,69 @@ export default function OffersView({ user }: OffersViewProps) {
           </div>
         </div>
       )}
+
+      {/* Offer details (read-only, tidy view for agents) */}
+      <AnimatePresence>
+        {viewOffer && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setViewOffer(null)}
+              className="absolute inset-0 bg-gray-900/50 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-3xl max-h-[90vh] flex flex-col bg-white dark:bg-gray-950 rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800"
+            >
+              <div className="p-6 sm:p-8 border-b border-gray-100 dark:border-gray-800 flex items-start justify-between gap-4">
+                <div className="space-y-3 min-w-0">
+                  <div className="flex flex-wrap gap-1.5">
+                    {(viewOffer.brand ? viewOffer.brand.split(',').map(b => b.trim()).filter(Boolean) : []).map((b, i) => (
+                      <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 text-orange-600 text-[10px] font-black uppercase tracking-widest">
+                        <Building2 size={12} />
+                        {b}
+                      </span>
+                    ))}
+                    {viewOffer.aggregators?.split(',').map((a, i) => (
+                      <span key={'a' + i} className="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">{a.trim()}</span>
+                    ))}
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight uppercase" dir="auto">{viewOffer.title}</h2>
+                </div>
+                <button onClick={() => setViewOffer(null)} className="p-3 bg-gray-50 dark:bg-gray-900 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-2xl transition-all shrink-0">
+                  <X size={22} />
+                </button>
+              </div>
+
+              <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center gap-2 mb-1"><DollarSign size={14} className="text-orange-500" /><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Price</span></div>
+                    <span className="text-lg font-black text-gray-900 dark:text-white" dir="auto">{viewOffer.price}</span>
+                  </div>
+                  <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center gap-2 mb-1"><Calendar size={14} className="text-gray-400" /><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Starts</span></div>
+                    <span className="text-sm font-bold text-gray-900 dark:text-gray-200">{formatDate(viewOffer.startDate)}</span>
+                  </div>
+                  <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center gap-2 mb-1"><Calendar size={14} className="text-gray-400" /><span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ends</span></div>
+                    <span className="text-sm font-bold text-gray-900 dark:text-gray-200">{formatDate(viewOffer.endDate)}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-[11px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] mb-3 ml-1">Offer details</div>
+                  <FormattedOfferText text={viewOffer.description} />
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Offer Modal */}
       <AnimatePresence>
