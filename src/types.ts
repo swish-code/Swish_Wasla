@@ -47,7 +47,7 @@ export interface AuthState {
   isLoading: boolean;
 }
 
-export type ViewType = 'branches' | 'new-order' | 'follow-up' | 'complain' | 'complaint-status' | 'additional' | 'special-requests' | 'meat-sources' | 'talabat-keeta' | 'kuwaiti-terms' | 'catering-packages' | 'pre-order' | 'pre-order-pro' | 'remote-areas' | 'cancellation' | 'shakir-contact' | 'yelo-contact' | 'bbt-contact' | 'mishmash-contact' | 'tabel-contact' | 'users-contact' | 'extension-contact' | 'employee-ex-contact' | 'allergens' | 'ingerines' | 'task' | 'login' | 'user-mgmt' | 'reports' | 'audit-logs' | 'custom-cards' | 'offers';
+export type ViewType = 'branches' | 'new-order' | 'follow-up' | 'complain' | 'complaint-status' | 'additional' | 'special-requests' | 'meat-sources' | 'talabat-keeta' | 'kuwaiti-terms' | 'catering-packages' | 'pre-order' | 'pre-order-pro' | 'remote-areas' | 'cancellation' | 'shakir-contact' | 'yelo-contact' | 'bbt-contact' | 'mishmash-contact' | 'tabel-contact' | 'users-contact' | 'extension-contact' | 'employee-ex-contact' | 'allergens' | 'ingerines' | 'task' | 'login' | 'user-mgmt' | 'reports' | 'audit-logs' | 'custom-cards' | 'offers' | 'aggregator-ids';
 
 export interface Point {
   text: string;

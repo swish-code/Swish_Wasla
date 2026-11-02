@@ -178,6 +178,7 @@ export default function TopNavbar({
         { label: 'Tabel Contact', onClick: () => setCurrentView('tabel-contact'), isActive: currentView === 'tabel-contact', viewId: 'cont-tabel' },
         { label: 'Users', onClick: () => setCurrentView('users-contact'), isActive: currentView === 'users-contact', viewId: 'cont-users' },
         { label: 'Employee Ex', onClick: () => setCurrentView('employee-ex-contact'), isActive: currentView === 'employee-ex-contact', viewId: 'cont-emp' },
+        { label: 'Aggregator IDs', onClick: () => setCurrentView('aggregator-ids'), isActive: currentView === 'aggregator-ids', viewId: 'cont-aggregator-ids' },
       ],
     },
     {

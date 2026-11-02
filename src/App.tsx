@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, ChevronDown, ChevronUp, ChevronRight, Phone, MapPin, Clock, Calendar, Globe, Star, Info, MessageSquare, AlertCircle, ShoppingBag, X, Beaker, User, Package, Skull, CalendarX, Frown, Wind, Waves, Flame, Archive, Repeat, Scale, Droplets, FlaskConical, Beef, AlertTriangle, Snowflake, Settings, PackageOpen, UserCircle, HelpCircle, ListChecks, Store, Smartphone, List, PencilLine, Image, Send, Bell, CreditCard, Truck, Users, Mail, Zap, Lock, LogOut, Plus, Trash2, Edit, Database, PhoneCall, XCircle, Activity, CloudRain, BarChart, ClipboardList, CheckCircle2, Check, RefreshCw, ArrowRight, Timer, Plug, Fan, Trees, Ruler, ChefHat, UtensilsCrossed } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BRANCH_DATA, BRANDS, PROCESS_SCRIPTS, COMPLAINT_STATUSES, MEAT_SOURCES, CATERING_DATA, CANCELLATION_DATA, CONTACTS_DATA, ALLERGEN_DATA, INGERINES_DATA, TASK_DATA } from './data';
+import { BRANCH_DATA, BRANDS, PROCESS_SCRIPTS, COMPLAINT_STATUSES, MEAT_SOURCES, CATERING_DATA, CANCELLATION_DATA, CONTACTS_DATA, ALLERGEN_DATA, INGERINES_DATA, TASK_DATA, AGGREGATOR_IDS } from './data';
 import { BranchData, ViewType, User as UserType, AuthState, UserRole, BranchColumn } from './types';
 import TopNavbar from './components/TopNavbar';
 import BranchModal from './components/BranchModal';
@@ -10,6 +10,7 @@ import NotificationCenter from './components/NotificationCenter';
 import { CustomCard, CustomCardManager } from './components/CustomCards';
 import { CustomCard as CustomCardType } from './types';
 import OffersView from './components/OffersView';
+import AggregatorIdsView from './components/AggregatorIdsView';
 
 const GlobalSearch = ({ 
   isOpen, 
@@ -189,6 +190,27 @@ const GlobalSearch = ({
       title: 'Tabel Contacts',
       subtitle: 'Navigation',
       view: 'tabel-contact' as ViewType
+    });
+
+    results.push({
+      type: 'Page',
+      title: 'Aggregator IDs',
+      subtitle: 'Deliveroo / Keeta / Talabat branch ids',
+      view: 'aggregator-ids' as ViewType
+    });
+
+    // Aggregator branch ids: a branch name or any id finds the row
+    AGGREGATOR_IDS.forEach(b => {
+      b.branches.forEach(r => {
+        if (r.branch.toLowerCase().includes(q) || (r.deliveroo && r.deliveroo.includes(q)) || (r.keeta && r.keeta.includes(q)) || (r.talabat && r.talabat.includes(q))) {
+          results.push({
+            type: 'Aggregator ID',
+            title: `${b.brand} – ${r.branch}`,
+            subtitle: [r.deliveroo && `Deliveroo ${r.deliveroo}`, r.keeta && `Keeta ${r.keeta}`, r.talabat && `Talabat ${r.talabat}`].filter(Boolean).join(' · '),
+            view: 'aggregator-ids' as ViewType
+          });
+        }
+      });
     });
 
     return results.slice(0, 8);
@@ -4042,6 +4064,17 @@ export default function App() {
                   </div>
                 ))}
               </div>
+            </motion.div>
+          ) : currentView === 'aggregator-ids' ? (
+            <motion.div
+              key="aggregator-ids"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="max-w-7xl mx-auto px-4 pb-12"
+            >
+              <AggregatorIdsView />
+              {renderCustomCards('aggregator-ids')}
             </motion.div>
           ) : currentView === 'users-contact' ? (
             <motion.div
