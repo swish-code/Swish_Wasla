@@ -24,3 +24,14 @@
 html:not(.dark) {
   color-scheme: light;
 }
+
+/* The text a notification points at: scrolled into view and flashed once (App.openNotification / flashContentKey). */
+.content-flash {
+  animation: content-flash 3s ease-out;
+  border-radius: 8px;
+}
+@keyframes content-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.9); background-color: rgba(59, 130, 246, 0.28); }
+  60%  { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); background-color: rgba(59, 130, 246, 0.16); }
+  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); background-color: transparent; }
+}

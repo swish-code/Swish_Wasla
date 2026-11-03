@@ -13,7 +13,8 @@ interface Notification {
   isRead?: boolean;
 }
 
-export default function NotificationCenter() {
+// onOpen: clicking a notification (list or toast) takes the person to the place it is about (App.openNotification)
+export default function NotificationCenter({ onOpen }: { onOpen?: (n: Notification) => void } = {}) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [toasts, setToasts] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -155,7 +156,15 @@ export default function NotificationCenter() {
                   </p>
                   <div className="mt-3 flex items-center justify-between">
                     <span className="text-[10px] text-gray-400 font-bold uppercase">{new Date(toast.createdAt).toLocaleTimeString()}</span>
-                    <button 
+                    {onOpen && (
+                      <button
+                        onClick={() => { onOpen(toast); markAsRead(toast.id); removeToast(toast.id); }}
+                        className="text-[10px] font-black text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg uppercase tracking-widest"
+                      >
+                        افتح
+                      </button>
+                    )}
+                    <button
                       onClick={() => {
                         markAsRead(toast.id);
                         removeToast(toast.id);
@@ -239,7 +248,9 @@ export default function NotificationCenter() {
                   safeNotifications.map((n) => (
                     <div
                       key={n.id}
-                      className={`p-4 rounded-2xl border transition-all ${n.isRead ? 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800' : 'bg-blue-50/30 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30 ring-1 ring-blue-100 dark:ring-blue-900/30'}`}
+                      onClick={() => { if (!onOpen) return; onOpen(n); markAsRead(n.id); setIsOpen(false); }}
+                      title={onOpen ? 'الانتقال إلى مكان التعديل' : undefined}
+                      className={`${onOpen ? 'cursor-pointer hover:shadow-md ' : ''}p-4 rounded-2xl border transition-all ${n.isRead ? 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800' : 'bg-blue-50/30 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30 ring-1 ring-blue-100 dark:ring-blue-900/30'}`}
                     >
                       <div className="flex gap-4">
                         <div className={`p-2 rounded-xl flex-shrink-0 ${n.isRead ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900 shadow-sm'}`}>
@@ -252,7 +263,7 @@ export default function NotificationCenter() {
                             </h5>
                             {!n.isRead && (
                               <button 
-                                onClick={() => markAsRead(n.id)}
+                                onClick={(e) => { e.stopPropagation(); markAsRead(n.id); }}
                                 className="p-1 hover:bg-white dark:hover:bg-gray-800 rounded-lg text-blue-500"
                               >
                                 <Check size={14} />

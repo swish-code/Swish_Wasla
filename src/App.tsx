@@ -364,11 +364,12 @@ const EditableText = ({
     setValue(defaultValue || '');
   }, [defaultValue]);
 
-  if (!canEdit) return <span className={className} dir="auto">{defaultValue}</span>;
+  // data-content-key marks where a text lives on the page, so a notification about it can scroll to it (openNotification)
+  if (!canEdit) return <span className={className} dir="auto" data-content-key={contentKey}>{defaultValue}</span>;
 
   if (isEditing) {
     return (
-      <div className="relative group/edit-box bg-white/10 dark:bg-black/10 backdrop-blur-sm p-4 rounded-2xl border-2 border-blue-500/50 w-full my-2 shadow-2xl z-50">
+      <div className="relative group/edit-box bg-white/10 dark:bg-black/10 backdrop-blur-sm p-4 rounded-2xl border-2 border-blue-500/50 w-full my-2 shadow-2xl z-50" data-content-key={contentKey}>
         {isTextArea ? (
           <textarea
             value={value}
@@ -417,7 +418,7 @@ const EditableText = ({
   }
 
   return (
-    <span className="group/editable relative inline-flex items-center gap-2 transition-all hover:ring-2 hover:ring-blue-400/50 rounded-md px-1 -mx-1 cursor-default">
+    <span className="group/editable relative inline-flex items-center gap-2 transition-all hover:ring-2 hover:ring-blue-400/50 rounded-md px-1 -mx-1 cursor-default" data-content-key={contentKey}>
       <span className={className} dir="auto">{defaultValue}</span>
       <button 
         type="button"
@@ -1395,6 +1396,64 @@ export default function App() {
     if (typeof defaultValue !== 'string' && defaultValue !== undefined) return defaultValue;
     const val = contentOverrides[key] !== undefined ? contentOverrides[key] : defaultValue;
     return val || '';
+  };
+
+  // --- Notification -> the place it is about ---
+  // Editable-text keys are built from the page and its selection (ing_<brand>_…, contact_<brand>_…, catering_<brand>_…),
+  // so the key alone says where to go. The element carrying the text is marked with data-content-key (EditableText);
+  // once the page is up it is scrolled into view and flashed. Other notifications open their section.
+  const flashContentKey = (key: string) => {
+    let tries = 0;
+    const tick = () => {
+      const el = document.querySelector<HTMLElement>(`[data-content-key="${CSS.escape(key)}"]`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('content-flash');
+        setTimeout(() => el.classList.remove('content-flash'), 3000);
+      } else if (tries++ < 25) {
+        setTimeout(tick, 150);   // the page may still be rendering after the view switch
+      }
+    };
+    setTimeout(tick, 200);
+  };
+  const openNotification = (n: { section: string; details: string }) => {
+    const details = n.details || '';
+    const m = /نص الموقع:\s*(\S+)/.exec(details);
+    if (m) {
+      const key = m[1];
+      const seg = key.split('_');
+      if (seg[0] === 'ing') { setSelectedIngerinesBrand(seg[1]); setCurrentView('ingerines'); }
+      else if (seg[0] === 'allergen') { setSelectedAllergenBrand(seg[1] as any); setCurrentView('allergens'); }
+      else if (seg[0] === 'catering') { setSelectedCateringBrand(key.slice('catering_'.length).replace(/_(pkg|extra|term).*$/, '') as any); setCurrentView('catering-packages'); }
+      else if (key.startsWith('contact_shakir')) setCurrentView('shakir-contact');
+      else if (key.startsWith('contact_yelo')) setCurrentView('yelo-contact');
+      else if (key.startsWith('contact_bbt')) setCurrentView('bbt-contact');
+      else if (key.startsWith('contact_mishmash')) setCurrentView('mishmash-contact');
+      else if (key.startsWith('contact_tabel')) setCurrentView('tabel-contact');
+      else if (key.startsWith('employee_ex')) setCurrentView('employee-ex-contact');
+      else if (key.startsWith('extension_')) setCurrentView('extension-contact');
+      else if (key.startsWith('users_')) setCurrentView('users-contact');
+      else if (key.startsWith('cancel_')) setCurrentView('cancellation');
+      else if (key.startsWith('process_newOrder')) setCurrentView('new-order');
+      else if (key.startsWith('process_followUp')) setCurrentView('follow-up');
+      else if (key.startsWith('process_talabat')) setCurrentView('talabat-keeta');
+      else if (key.startsWith('process_complain')) setCurrentView('complain');
+      flashContentKey(key);
+      return;
+    }
+    const brandIn = /\(([^)]+)\)\s*$/.exec(details)?.[1];
+    switch (n.section) {
+      case 'المستخدمين': setCurrentView('user-mgmt'); break;
+      case 'الفروع':
+      case 'إعدادات الفروع':
+        if (brandIn && (BRANDS as readonly string[]).includes(brandIn)) setSelectedBrand(brandIn);
+        setCurrentView('branches');
+        break;
+      case 'إدارة المهام': setCurrentView('task'); break;
+      case 'البطاقات المخصصة': setCurrentView('custom-cards'); break;
+      case 'العروض': setCurrentView('offers'); break;
+      default: break;
+    }
   };
 
   // --- Translatable Helper ---
@@ -6155,7 +6214,7 @@ export default function App() {
               onDelete={handleDeleteTask}
               editingTask={editingTask}
             />
-            <NotificationCenter />
+            <NotificationCenter onOpen={openNotification} />
           </>
         )}
       </div>
